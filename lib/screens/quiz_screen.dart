@@ -438,7 +438,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
           const SizedBox(height: 16),
           Text(
             question.question,
-            style: PixelTheme.pixelText(size: 11, height: 1.8),
+            style: PixelTheme.questionText(size: 18, height: 1.8),
             textAlign: TextAlign.center,
           ),
         ],
@@ -482,7 +482,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                 children: [
                   Text('HINT', style: PixelTheme.pixelText(size: 7, color: PixelTheme.accent)),
                   const SizedBox(height: 6),
-                  Text(explanation, style: PixelTheme.pixelText(size: 8, height: 1.6)),
+                  Text(explanation, style: PixelTheme.questionText(size: 14, height: 1.6)),
                 ],
               ),
             ),

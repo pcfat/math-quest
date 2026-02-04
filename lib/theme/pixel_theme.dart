@@ -30,6 +30,24 @@ class PixelTheme {
     colors: [bgDark, Color(0xFF0f0f1e)],
   );
   
+  // 題目專用字體 (清晰易讀)
+  static const String questionFont = 'Times New Roman';
+  static const String questionFontChinese = 'PMingLiU';  // 新細明體
+  
+  // 題目文字樣式 - 使用標準字體
+  static TextStyle questionText({
+    double size = 16,
+    Color color = textLight,
+    double? height,
+  }) {
+    return TextStyle(
+      fontFamily: questionFontChinese,
+      fontSize: size,
+      color: color,
+      height: height ?? 1.6,
+    );
+  }
+  
   // 像素字體
   static const String pixelFont = 'PressStart2P';
   
@@ -521,11 +539,11 @@ class _PixelOptionButtonState extends State<PixelOptionButton> {
               ),
             ),
             const SizedBox(width: 12),
-            // Text
+            // Text - 使用清晰字體顯示選項
             Expanded(
               child: Text(
                 widget.text,
-                style: PixelTheme.pixelText(size: 10),
+                style: PixelTheme.questionText(size: 16),
               ),
             ),
             // Result icon
