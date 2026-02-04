@@ -8,6 +8,7 @@ import 'profile_screen.dart';
 import 'daily_mission_screen.dart';
 import 'leaderboard_screen.dart';
 import 'achievements_screen.dart';
+import 'pet_collection_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -113,6 +114,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
+          // 寵物顯示
+          if (gameState.activePet != null)
+            GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PetCollectionScreen()),
+              ),
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: PixelTheme.accent.withOpacity(0.2),
+                  border: Border.all(color: PixelTheme.accent, width: 3),
+                ),
+                child: Center(
+                  child: Text(gameState.activePet!.emoji, style: const TextStyle(fontSize: 24)),
+                ),
+              ),
+            ),
+          
+          const SizedBox(width: 8),
+          
           // 玩家頭像和等級
           GestureDetector(
             onTap: () => Navigator.push(

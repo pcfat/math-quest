@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'data/game_state.dart';
 import 'screens/home_screen.dart';
+import 'screens/pet_selection_screen.dart';
 import 'theme/pixel_theme.dart';
 
 void main() {
@@ -50,8 +51,26 @@ class MathGameApp extends StatelessWidget {
             brightness: Brightness.dark,
           ),
         ),
-        home: const HomeScreen(),
+        home: const AppRouter(),
       ),
     );
+  }
+}
+
+/// 根據用戶狀態決定顯示哪個頁面
+class AppRouter extends StatelessWidget {
+  const AppRouter({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final gameState = context.watch<GameState>();
+    
+    // 如果未選擇初始寵物，顯示選擇頁面
+    if (!gameState.hasChosenStarterPet) {
+      return const PetSelectionScreen();
+    }
+    
+    // 否則顯示主頁
+    return const HomeScreen();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
+import '../models/pet_models.dart';
 import 'questions_data.dart';
 import 'dart:convert';
 import 'dart:math';
@@ -32,6 +33,12 @@ class GameState extends ChangeNotifier {
   int _level = 1;
   int _experience = 0;
   
+  // Phase 4: 寵物系統
+  Pet? _activePet;
+  List<String> _ownedPetIds = [];
+  bool _hasChosenStarterPet = false;
+  BattleState? _battleState;
+  
   // Getters
   UserProgress get progress => _progress;
   Topic? get currentTopic => _currentTopic;
@@ -52,6 +59,20 @@ class GameState extends ChangeNotifier {
   int get experienceForNextLevel => level * 100;
   double get levelProgress => experience / experienceForNextLevel;
   
+  // 寵物 Getters
+  Pet? get activePet => _activePet;
+  List<String> get ownedPetIds => _ownedPetIds;
+  bool get hasChosenStarterPet => _hasChosenStarterPet;
+  BattleState? get battleState => _battleState;
+  
+  List<Pet> get ownedPets {
+    return PetsData.allPets.where((p) => _ownedPetIds.contains(p.id)).toList();
+  }
+  
+  List<Pet> get lockedPets {
+    return PetsData.unlockablePets.where((p) => !_ownedPetIds.contains(p.id)).toList();
+  }
+  
   Question? get currentQuestion {
     if (_currentTopic == null) return null;
     if (_currentQuestionIndex >= _currentTopic!.questions.length) return null;
@@ -64,6 +85,53 @@ class GameState extends ChangeNotifier {
   GameState() {
     _initAchievements();
     _loadProgress();
+  }
+  
+  // 選擇初始寵物
+  void chooseStarterPet(Pet pet) {
+    _activePet = pet;
+    _ownedPetIds.add(pet.id);
+    _hasChosenStarterPet = true;
+    _saveProgress();
+    notifyListeners();
+  }
+  
+  // 設置當前寵物
+  void setActivePet(Pet pet) {
+    if (_ownedPetIds.contains(pet.id)) {
+      _activePet = pet;
+      _saveProgress();
+      notifyListeners();
+    }
+  }
+  
+  // 解鎖寵物
+  void unlockPet(String petId) {
+    if (!_ownedPetIds.contains(petId)) {
+      _ownedPetIds.add(petId);
+      _saveProgress();
+      notifyListeners();
+    }
+  }
+  
+  // 檢查並解鎖寵物
+  void _checkPetUnlocks() {
+    // 完成 10 次每日任務 -> 不死鳳凰
+    if (_progress.dailyMissionsCompleted >= 10) {
+      unlockPet('phoenix');
+    }
+    // 累積 1000 分 -> 獨角獸
+    if (_progress.totalScore >= 1000) {
+      unlockPet('unicorn');
+    }
+    // 完成所有課題 -> 幽靈小鬼
+    if (_progress.topicAttempts.length >= 6) {
+      unlockPet('ghost');
+    }
+    // 累積 10000 分 -> 黃金神龍
+    if (_progress.totalScore >= 10000) {
+      unlockPet('golden_dragon');
+    }
   }
   
   // 初始化成就
@@ -161,6 +229,17 @@ class GameState extends ChangeNotifier {
     _level = prefs.getInt('level') ?? 1;
     _experience = prefs.getInt('experience') ?? 0;
     
+    // 載入寵物數據
+    _hasChosenStarterPet = prefs.getBool('hasChosenStarterPet') ?? false;
+    _ownedPetIds = prefs.getStringList('ownedPets') ?? [];
+    final activePetId = prefs.getString('activePetId');
+    if (activePetId != null) {
+      _activePet = PetsData.allPets.firstWhere(
+        (p) => p.id == activePetId,
+        orElse: () => PetsData.starterPets.first,
+      );
+    }
+    
     final progressJson = prefs.getString('progress');
     if (progressJson != null) {
       final data = jsonDecode(progressJson);
@@ -194,6 +273,13 @@ class GameState extends ChangeNotifier {
     prefs.setString('avatar', _avatarEmoji);
     prefs.setInt('level', _level);
     prefs.setInt('experience', _experience);
+    
+    // 儲存寵物數據
+    prefs.setBool('hasChosenStarterPet', _hasChosenStarterPet);
+    prefs.setStringList('ownedPets', _ownedPetIds);
+    if (_activePet != null) {
+      prefs.setString('activePetId', _activePet!.id);
+    }
     
     final progressData = {
       'topicScores': _progress.topicScores,
@@ -284,7 +370,7 @@ class GameState extends ChangeNotifier {
     _saveProgress();
   }
   
-  // 開始測驗
+  // 開始測驗 (帶戰鬥系統)
   void startQuiz(Topic topic, {bool timed = false}) {
     _currentTopic = topic;
     _currentQuestionIndex = 0;
@@ -294,6 +380,18 @@ class GameState extends ChangeNotifier {
     _isTimedMode = timed;
     _timeRemaining = timed ? 60 : 0;
     _timerActive = timed;
+    
+    // 初始化戰鬥
+    if (_activePet != null) {
+      final monster = MonstersData.getMonsterForTopic(topic.id);
+      _battleState = BattleState(
+        pet: _activePet!,
+        monster: monster,
+        playerHp: 100,
+        playerMaxHp: 100,
+      );
+    }
+    
     notifyListeners();
   }
   
@@ -310,7 +408,7 @@ class GameState extends ChangeNotifier {
     }
   }
   
-  // 回答問題
+  // 回答問題 (帶戰鬥)
   bool answerQuestion(int selectedIndex) {
     if (currentQuestion == null) return false;
     
@@ -318,21 +416,35 @@ class GameState extends ChangeNotifier {
     if (isCorrect) {
       int points = 10 * currentQuestion!.difficulty;
       if (_isTimedMode) {
-        points = (points * 1.5).round(); // 限時模式加成
+        points = (points * 1.5).round();
       }
       _sessionScore += points;
       _sessionCorrect++;
       _progress.streak++;
       
-      // 檢查連勝成就
+      // 戰鬥：攻擊怪物
+      if (_battleState != null) {
+        final damage = 10 + currentQuestion!.difficulty * 5 + (_activePet?.attack ?? 0);
+        _battleState!.attackMonster(damage);
+      }
+      
       _checkAchievement(AchievementType.streak, _progress.streak);
     } else {
       _progress.streak = 0;
+      
+      // 戰鬥：怪物攻擊玩家
+      if (_battleState != null) {
+        _battleState!.attackPlayer();
+      }
     }
     
     notifyListeners();
     return isCorrect;
   }
+  
+  // 檢查是否戰敗
+  bool get isBattleLost => _battleState != null && !_battleState!.isPlayerAlive;
+  bool get isBattleWon => _battleState != null && !_battleState!.isMonsterAlive;
   
   // 下一題
   void nextQuestion() {
@@ -346,26 +458,22 @@ class GameState extends ChangeNotifier {
       _progress.updateScore(_currentTopic!.id, _sessionScore);
       _progress.quizzesCompleted++;
       
-      // 增加經驗值
       _addExperience(_sessionScore ~/ 2);
       
-      // 檢查成就
       _checkAchievement(AchievementType.quizComplete, _progress.quizzesCompleted);
       _checkAchievement(AchievementType.totalScore, _progress.totalScore);
       _checkAchievement(AchievementType.topicsPlayed, _progress.topicAttempts.length);
       
-      // 檢查完美分數
       if (_sessionCorrect == totalQuestions && totalQuestions > 0) {
         _checkAchievement(AchievementType.accuracy, 100);
       }
       
-      // 檢查限時模式成就
       if (_isTimedMode) {
         _checkAchievement(AchievementType.timedScore, _sessionScore);
       }
       
-      // 檢查每日任務
       _checkDailyMission();
+      _checkPetUnlocks();
       
       _saveProgress();
     }
@@ -404,7 +512,7 @@ class GameState extends ChangeNotifier {
           value >= achievement.requirement &&
           !_unlockedAchievements.contains(achievement.id)) {
         _unlockedAchievements.add(achievement.id);
-        _addExperience(50); // 成就獎勵
+        _addExperience(50);
       }
     }
   }
@@ -418,6 +526,7 @@ class GameState extends ChangeNotifier {
     _isQuizActive = false;
     _isTimedMode = false;
     _timerActive = false;
+    _battleState = null;
     notifyListeners();
   }
   
@@ -436,7 +545,6 @@ class GameState extends ChangeNotifier {
       LeaderboardEntry(rank: 5, name: '數字精靈', score: 5555, avatar: '✨'),
     ];
     
-    // 加入當前玩家
     int playerRank = 6;
     for (int i = 0; i < entries.length; i++) {
       if (_progress.totalScore > entries[i].score) {
@@ -456,7 +564,6 @@ class GameState extends ChangeNotifier {
       ),
     );
     
-    // 重新排序
     for (int i = 0; i < entries.length; i++) {
       entries[i] = entries[i].copyWith(rank: i + 1);
     }
