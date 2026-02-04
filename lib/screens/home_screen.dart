@@ -190,27 +190,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       },
       child: Column(
         children: [
-          // 遊戲圖標
+          // 遊戲圖標 - 使用自定義 logo
           Container(
-            width: 100,
-            height: 100,
+            width: 120,
+            height: 120,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [PixelTheme.primary, PixelTheme.accent],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              border: Border.all(color: PixelTheme.textLight, width: 4),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
-                  color: PixelTheme.primary,
-                  blurRadius: 20,
-                  spreadRadius: 2,
+                  color: PixelTheme.primary.withOpacity(0.5),
+                  blurRadius: 30,
+                  spreadRadius: 5,
                 ),
               ],
             ),
-            child: const Center(
-              child: Text('📐', style: TextStyle(fontSize: 50)),
+            child: Image.asset(
+              'assets/logo.png',
+              fit: BoxFit.contain,
             ),
           ),
           
