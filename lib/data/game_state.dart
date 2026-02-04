@@ -372,7 +372,8 @@ class GameState extends ChangeNotifier {
   
   // 開始測驗 (帶戰鬥系統)
   void startQuiz(Topic topic, {bool timed = false}) {
-    _currentTopic = topic;
+    // 隨機化題目順序和答案順序
+    _currentTopic = topic.shuffled();
     _currentQuestionIndex = 0;
     _sessionScore = 0;
     _sessionCorrect = 0;

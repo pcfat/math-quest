@@ -215,8 +215,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         children: [
           // 遊戲圖標 - 使用自定義 logo
           Container(
-            width: 120,
-            height: 120,
+            width: 140,
+            height: 140,
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
@@ -226,9 +226,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            child: Image.asset(
-              'assets/logo.png',
-              fit: BoxFit.contain,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.asset(
+                'assets/logo.png',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback if image fails to load
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: PixelTheme.bgMid,
+                      border: Border.all(color: PixelTheme.primary, width: 4),
+                    ),
+                    child: const Center(
+                      child: Text('📐', style: TextStyle(fontSize: 60)),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           

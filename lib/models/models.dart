@@ -1,3 +1,5 @@
+import 'dart:math';
+
 /// 題目模型
 class Question {
   final String id;
@@ -19,6 +21,23 @@ class Question {
   bool checkAnswer(int selectedIndex) => selectedIndex == correctIndex;
   
   String get correctAnswer => options[correctIndex];
+  
+  /// 創建一個答案順序隨機化的新題目
+  Question shuffled(Random random) {
+    final correctAnswerText = options[correctIndex];
+    final shuffledOptions = List<String>.from(options);
+    shuffledOptions.shuffle(random);
+    final newCorrectIndex = shuffledOptions.indexOf(correctAnswerText);
+    
+    return Question(
+      id: id,
+      question: question,
+      options: shuffledOptions,
+      correctIndex: newCorrectIndex,
+      explanation: explanation,
+      difficulty: difficulty,
+    );
+  }
 }
 
 /// 課題模型
@@ -42,6 +61,23 @@ class Topic {
   });
 
   int get totalQuestions => questions.length;
+  
+  /// 創建一個題目順序和答案都隨機化的課題
+  Topic shuffled([int? seed]) {
+    final random = Random(seed ?? DateTime.now().millisecondsSinceEpoch);
+    final shuffledQuestions = questions.map((q) => q.shuffled(random)).toList();
+    shuffledQuestions.shuffle(random);
+    
+    return Topic(
+      id: id,
+      name: name,
+      nameEn: nameEn,
+      icon: icon,
+      grade: grade,
+      questions: shuffledQuestions,
+      color: color,
+    );
+  }
 }
 
 /// 用戶進度
