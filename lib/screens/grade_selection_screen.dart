@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
 import 'pet_selection_screen.dart';
@@ -11,9 +12,12 @@ class GradeSelectionScreen extends StatefulWidget {
   State<GradeSelectionScreen> createState() => _GradeSelectionScreenState();
 }
 
-class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
+class _GradeSelectionScreenState extends State<GradeSelectionScreen>
+    with TickerProviderStateMixin {
   String? _selectedGrade;
   String? _selectedLanguage;
+  late AnimationController _fadeController;
+  late AnimationController _bounceController;
 
   final List<Map<String, dynamic>> _grades = [
     {'id': 's1', 'name': '中一', 'nameEn': 'Form 1', 'icon': '📕'},
@@ -32,120 +36,164 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
   bool get _canContinue => _selectedGrade != null && _selectedLanguage != null;
 
   @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    )..forward();
+    
+    _bounceController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _bounceController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(gradient: PixelTheme.bgGradient),
         child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 30),
-              
-              // Logo
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.white.withOpacity(0.4),
-                      blurRadius: 30,
-                      spreadRadius: 5,
+          child: FadeTransition(
+            opacity: _fadeController,
+            child: Column(
+              children: [
+                const SizedBox(height: 30),
+                
+                // Logo with glow
+                AnimatedBuilder(
+                  animation: _bounceController,
+                  builder: (context, child) {
+                    final offset = math.sin(_bounceController.value * math.pi) * 5;
+                    return Transform.translate(
+                      offset: Offset(0, offset),
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: PixelTheme.primary.withOpacity(0.3),
+                          blurRadius: 30,
+                          spreadRadius: 5,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Image.asset(
-                  'assets/logo.png',
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Text('📐', style: TextStyle(fontSize: 40)),
-                ),
-              ),
-              
-              const SizedBox(height: 20),
-              
-              // 標題
-              Text(
-                'SETTINGS',
-                style: PixelTheme.pixelTitle(size: 24, color: PixelTheme.secondary),
-              ),
-              
-              const SizedBox(height: 8),
-              
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: PixelTheme.bgMid,
-                  border: Border.all(color: PixelTheme.textDim, width: 2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '💡 稍後可在設定中更改',
-                  style: PixelTheme.pixelText(size: 8, color: PixelTheme.accent),
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // 選擇內容
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    children: [
-                      // 年級選擇
-                      _buildSectionHeader('選擇年級', 'SELECT GRADE'),
-                      const SizedBox(height: 12),
-                      _buildGradeGrid(),
-                      
-                      const SizedBox(height: 28),
-                      
-                      // 語言選擇
-                      _buildSectionHeader('題目語言', 'QUESTION LANGUAGE'),
-                      const SizedBox(height: 12),
-                      _buildLanguageSelection(),
-                      
-                      const SizedBox(height: 24),
-                    ],
+                    child: Image.asset(
+                      'assets/logo.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const Text('📐', style: TextStyle(fontSize: 50)),
+                    ),
                   ),
                 ),
-              ),
-              
-              // 確認按鈕
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: PixelButton(
-                  text: 'CONTINUE',
-                  emoji: '▶',
-                  color: _canContinue ? PixelTheme.primary : PixelTheme.textDim,
-                  height: 56,
-                  fontSize: 10,
-                  onPressed: _canContinue ? () => _confirmSelection(context) : null,
+                
+                const SizedBox(height: 20),
+                
+                // 標題
+                ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: [PixelTheme.secondary, PixelTheme.accent],
+                  ).createShader(bounds),
+                  child: Text(
+                    'WELCOME!',
+                    style: PixelTheme.pixelTitle(size: 28, color: Colors.white),
+                  ),
                 ),
-              ),
-            ],
+                
+                const SizedBox(height: 8),
+                
+                Text(
+                  '歡迎來到數學大冒險',
+                  style: PixelTheme.pixelText(size: 12, color: PixelTheme.textDim),
+                ),
+                
+                const SizedBox(height: 12),
+                
+                // 提示 badge
+                PixelBadge(
+                  text: '💡 稍後可在設定中更改',
+                  color: PixelTheme.bgLight,
+                  fontSize: 7,
+                ),
+                
+                const SizedBox(height: 24),
+                
+                // 選擇內容
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        // 年級選擇
+                        _buildSectionHeader('選擇年級', 'SELECT GRADE', '📚'),
+                        const SizedBox(height: 16),
+                        _buildGradeGrid(),
+                        
+                        const SizedBox(height: 32),
+                        
+                        // 語言選擇
+                        _buildSectionHeader('題目語言', 'QUESTION LANGUAGE', '🌐'),
+                        const SizedBox(height: 16),
+                        _buildLanguageSelection(),
+                        
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                // 確認按鈕
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: AnimatedOpacity(
+                    opacity: _canContinue ? 1.0 : 0.5,
+                    duration: const Duration(milliseconds: 300),
+                    child: PixelButton(
+                      text: 'CONTINUE',
+                      emoji: '▶️',
+                      color: _canContinue ? PixelTheme.primary : PixelTheme.textDim,
+                      height: 60,
+                      fontSize: 12,
+                      onPressed: _canContinue ? () => _confirmSelection(context) : null,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
   
-  Widget _buildSectionHeader(String title, String subtitle) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 24,
-          color: PixelTheme.secondary,
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: PixelTheme.pixelText(size: 12, color: PixelTheme.textLight)),
-            Text(subtitle, style: PixelTheme.pixelText(size: 7, color: PixelTheme.textDim)),
-          ],
-        ),
-      ],
+  Widget _buildSectionHeader(String title, String subtitle, String emoji) {
+    return PixelCard(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      borderColor: PixelTheme.accent,
+      child: Row(
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 24)),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: PixelTheme.pixelText(size: 12, color: PixelTheme.textLight)),
+              Text(subtitle, style: PixelTheme.pixelText(size: 7, color: PixelTheme.textDim)),
+            ],
+          ),
+        ],
+      ),
     );
   }
   
@@ -153,7 +201,19 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     return Wrap(
       spacing: 12,
       runSpacing: 12,
-      children: _grades.map((grade) => _buildGradeCard(grade)).toList(),
+      children: _grades.asMap().entries.map((entry) {
+        return TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: Duration(milliseconds: 300 + entry.key * 100),
+          builder: (context, value, child) {
+            return Transform.scale(
+              scale: value,
+              child: Opacity(opacity: value, child: child),
+            );
+          },
+          child: _buildGradeCard(entry.value),
+        );
+      }).toList(),
     );
   }
   
@@ -165,7 +225,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: 100,
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: isSelected 
               ? PixelTheme.primary.withOpacity(0.2)
@@ -174,28 +234,35 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
             color: isSelected ? PixelTheme.primary : PixelTheme.textDim,
             width: isSelected ? 4 : 2,
           ),
-          boxShadow: isSelected ? [
+          boxShadow: [
             BoxShadow(
-              color: PixelTheme.primary.withOpacity(0.3),
-              blurRadius: 10,
-              spreadRadius: 2,
+              color: isSelected 
+                  ? PixelTheme.primary.withOpacity(0.4)
+                  : Colors.black.withOpacity(0.3),
+              blurRadius: isSelected ? 15 : 5,
+              spreadRadius: isSelected ? 2 : 0,
+              offset: const Offset(0, 4),
             ),
-          ] : null,
+          ],
         ),
         child: Column(
           children: [
-            Text(grade['icon'], style: const TextStyle(fontSize: 26)),
-            const SizedBox(height: 6),
+            AnimatedScale(
+              scale: isSelected ? 1.2 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              child: Text(grade['icon'], style: const TextStyle(fontSize: 28)),
+            ),
+            const SizedBox(height: 8),
             Text(
               grade['name'],
               style: PixelTheme.pixelText(
-                size: 10,
+                size: 11,
                 color: isSelected ? PixelTheme.primary : PixelTheme.textLight,
               ),
             ),
             Text(
               grade['nameEn'],
-              style: PixelTheme.pixelText(size: 6, color: PixelTheme.textDim),
+              style: PixelTheme.pixelText(size: 7, color: PixelTheme.textDim),
             ),
           ],
         ),
@@ -205,47 +272,65 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
   
   Widget _buildLanguageSelection() {
     return Row(
-      children: _languages.map((lang) {
+      children: _languages.asMap().entries.map((entry) {
+        final lang = entry.value;
         final isSelected = _selectedLanguage == lang['id'];
         
         return Expanded(
-          child: GestureDetector(
-            onTap: () => setState(() => _selectedLanguage = lang['id']),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: EdgeInsets.only(
-                left: lang['id'] == 'en' ? 8 : 0,
-                right: lang['id'] == 'zh' ? 8 : 0,
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              decoration: BoxDecoration(
-                color: isSelected 
-                    ? PixelTheme.accent.withOpacity(0.2)
-                    : PixelTheme.bgMid,
-                border: Border.all(
-                  color: isSelected ? PixelTheme.accent : PixelTheme.textDim,
-                  width: isSelected ? 4 : 2,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: Duration(milliseconds: 500 + entry.key * 200),
+            builder: (context, value, child) {
+              return Transform.translate(
+                offset: Offset(0, 20 * (1 - value)),
+                child: Opacity(opacity: value, child: child),
+              );
+            },
+            child: GestureDetector(
+              onTap: () => setState(() => _selectedLanguage = lang['id']),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: EdgeInsets.only(
+                  left: lang['id'] == 'en' ? 8 : 0,
+                  right: lang['id'] == 'zh' ? 8 : 0,
                 ),
-                boxShadow: isSelected ? [
-                  BoxShadow(
-                    color: PixelTheme.accent.withOpacity(0.3),
-                    blurRadius: 10,
-                    spreadRadius: 2,
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                decoration: BoxDecoration(
+                  color: isSelected 
+                      ? PixelTheme.accent.withOpacity(0.2)
+                      : PixelTheme.bgMid,
+                  border: Border.all(
+                    color: isSelected ? PixelTheme.accent : PixelTheme.textDim,
+                    width: isSelected ? 4 : 2,
                   ),
-                ] : null,
-              ),
-              child: Column(
-                children: [
-                  Text(lang['icon'], style: const TextStyle(fontSize: 36)),
-                  const SizedBox(height: 10),
-                  Text(
-                    lang['name'],
-                    style: PixelTheme.pixelText(
-                      size: 12,
-                      color: isSelected ? PixelTheme.accent : PixelTheme.textLight,
+                  boxShadow: [
+                    BoxShadow(
+                      color: isSelected 
+                          ? PixelTheme.accent.withOpacity(0.4)
+                          : Colors.black.withOpacity(0.3),
+                      blurRadius: isSelected ? 15 : 5,
+                      spreadRadius: isSelected ? 2 : 0,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    AnimatedScale(
+                      scale: isSelected ? 1.2 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Text(lang['icon'], style: const TextStyle(fontSize: 40)),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      lang['name'],
+                      style: PixelTheme.pixelText(
+                        size: 14,
+                        color: isSelected ? PixelTheme.accent : PixelTheme.textLight,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -261,7 +346,19 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const PetSelectionScreen()),
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => const PetSelectionScreen(),
+        transitionsBuilder: (_, animation, __, child) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(1, 0),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 400),
+      ),
     );
   }
 }
