@@ -32,32 +32,34 @@ class _AdventureScreenState extends State<AdventureScreen>
   // 動畫
   late AnimationController _walkController;
   late AnimationController _encounterController;
+  late AnimationController _waterController;
   bool _showEncounter = false;
   bool _isMoving = false;
   
-  // 地圖圖層
-  // 0=草地, 1=深草(可遇敵), 2=花, 3=樹, 4=水, 5=路, 6=建築, 7=門, 8=柵欄
+  // 地圖圖層 (更豐富的地圖)
+  // 0=草地, 1=深草(可遇敵), 2=花, 3=樹, 4=水, 5=路, 6=建築, 7=門, 8=石頭, 9=草叢2
   final List<List<int>> _groundLayer = [
-    [3, 3, 3, 3, 3, 3, 3, 7, 3, 3, 3, 3, 3, 3, 3],
-    [3, 0, 0, 0, 0, 1, 1, 5, 1, 1, 0, 0, 2, 0, 3],
-    [3, 0, 6, 6, 0, 1, 1, 5, 1, 1, 0, 6, 6, 0, 3],
-    [3, 0, 6, 6, 0, 0, 0, 5, 0, 0, 0, 6, 6, 0, 3],
-    [3, 0, 0, 0, 0, 2, 0, 5, 0, 2, 0, 0, 0, 0, 3],
-    [3, 1, 1, 0, 5, 5, 5, 5, 5, 5, 5, 0, 1, 1, 3],
-    [3, 1, 1, 0, 5, 0, 0, 0, 0, 0, 5, 0, 1, 1, 3],
+    [3, 3, 3, 3, 3, 8, 8, 7, 8, 8, 3, 3, 3, 3, 3],
+    [3, 0, 2, 0, 0, 1, 1, 5, 1, 1, 0, 0, 2, 0, 3],
+    [3, 0, 6, 6, 0, 1, 9, 5, 9, 1, 0, 6, 6, 0, 3],
+    [3, 2, 6, 6, 0, 0, 0, 5, 0, 0, 0, 6, 6, 2, 3],
+    [3, 0, 0, 0, 2, 0, 0, 5, 0, 0, 2, 0, 0, 0, 3],
+    [3, 1, 9, 0, 5, 5, 5, 5, 5, 5, 5, 0, 9, 1, 3],
+    [3, 1, 1, 0, 5, 0, 2, 0, 2, 0, 5, 0, 1, 1, 3],
+    [3, 9, 0, 0, 5, 0, 4, 4, 4, 0, 5, 0, 0, 9, 3],
+    [3, 0, 2, 0, 5, 0, 4, 4, 4, 0, 5, 0, 2, 0, 3],
     [3, 0, 0, 0, 5, 0, 4, 4, 4, 0, 5, 0, 0, 0, 3],
-    [3, 2, 0, 0, 5, 0, 4, 4, 4, 0, 5, 0, 0, 2, 3],
-    [3, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 0, 3],
-    [3, 0, 2, 0, 5, 5, 5, 5, 5, 5, 5, 0, 2, 0, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 2, 0, 2, 5, 5, 5, 5, 5, 5, 5, 2, 0, 2, 3],
+    [3, 3, 3, 3, 3, 3, 8, 8, 8, 3, 3, 3, 3, 3, 3],
   ];
   
   // NPC 位置
   final List<Map<String, dynamic>> _npcs = [
-    {'x': 3, 'y': 4, 'emoji': '👨‍🏫', 'name': '數學老師'},
-    {'x': 11, 'y': 4, 'emoji': '👩‍🔬', 'name': '科學老師'},
-    {'x': 6, 'y': 9, 'emoji': '🧑‍🎓', 'name': '學生'},
-    {'x': 9, 'y': 6, 'emoji': '👧', 'name': '同學'},
+    {'x': 3, 'y': 3, 'emoji': '👨‍🏫', 'name': '數學老師', 'dialog': '努力學習數學吧！'},
+    {'x': 12, 'y': 3, 'emoji': '👩‍🔬', 'name': '科學老師', 'dialog': '科學和數學密不可分！'},
+    {'x': 6, 'y': 6, 'emoji': '🧑‍🎓', 'name': '學生A', 'dialog': '這裡的草叢有怪物！'},
+    {'x': 8, 'y': 6, 'emoji': '👧', 'name': '學生B', 'dialog': '小心深色草叢！'},
+    {'x': 1, 'y': 5, 'emoji': '🐕', 'name': '小狗', 'dialog': '汪汪！'},
   ];
   
   // 怪物列表
@@ -69,27 +71,28 @@ class _AdventureScreenState extends State<AdventureScreen>
     Monster(name: '幾何巨人', emoji: '🗿', minLevel: 5, maxLevel: 10),
   ];
   
-  // Tile 顏色和 emoji
+  // Tile 顏色和 emoji (更豐富)
   final Map<int, Color> _tileColors = {
-    0: const Color(0xFF7ec850), // 草地
+    0: const Color(0xFF90c960), // 草地 (更亮)
     1: const Color(0xFF5a9a32), // 深草
-    2: const Color(0xFF7ec850), // 花 (草地底色)
-    3: const Color(0xFF3d6e24), // 樹
-    4: const Color(0xFF3498db), // 水
-    5: const Color(0xFFc4a574), // 路
-    6: const Color(0xFF8b6914), // 建築
-    7: const Color(0xFFc4a574), // 門
-    8: const Color(0xFF6b4423), // 柵欄
+    2: const Color(0xFF90c960), // 花 (草地底色)
+    3: const Color(0xFF2d5a14), // 樹 (更深)
+    4: const Color(0xFF4aa8d8), // 水 (更亮)
+    5: const Color(0xFFd4b896), // 路 (更亮)
+    6: const Color(0xFFa67c4a), // 建築 (更亮)
+    7: const Color(0xFFd4b896), // 門
+    8: const Color(0xFF7a7a7a), // 石頭
+    9: const Color(0xFF6aaa42), // 草叢2 (中等綠)
   };
   
-  final Map<int, String> _tileEmoji = {
+  final Map<int, String> _tileEmojis = {
     2: '🌸', // 花
     3: '🌲', // 樹
-    4: '🌊', // 水 (動畫用)
+    8: '🪨', // 石頭
   };
   
   // 可通行的 tile
-  final Set<int> _walkableTiles = {0, 1, 2, 5, 7};
+  final Set<int> _walkableTiles = {0, 1, 2, 5, 7, 9};
 
   @override
   void initState() {
@@ -104,6 +107,11 @@ class _AdventureScreenState extends State<AdventureScreen>
       vsync: this,
     );
     
+    _waterController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    )..repeat();
+    
     _resetEncounterSteps();
   }
 
@@ -111,6 +119,7 @@ class _AdventureScreenState extends State<AdventureScreen>
   void dispose() {
     _walkController.dispose();
     _encounterController.dispose();
+    _waterController.dispose();
     super.dispose();
   }
   
@@ -357,7 +366,54 @@ class _AdventureScreenState extends State<AdventureScreen>
   Widget _buildTile(int x, int y) {
     final tileType = _groundLayer[y][x];
     final color = _tileColors[tileType] ?? Colors.grey;
-    final emoji = _tileEmoji[tileType];
+    final emoji = _tileEmojis[tileType];
+    
+    // 水波動畫
+    if (tileType == 4) {
+      return AnimatedBuilder(
+        animation: _waterController,
+        builder: (context, child) {
+          final wave = math.sin(_waterController.value * math.pi * 2 + x + y) * 0.15;
+          return Container(
+            width: _tileSize,
+            height: _tileSize,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.8 + wave),
+              border: Border.all(color: color.withOpacity(0.5), width: 0.5),
+            ),
+            child: Center(
+              child: Text('🌊', style: TextStyle(fontSize: _tileSize * 0.5)),
+            ),
+          );
+        },
+      );
+    }
+    
+    // 深草擺動
+    if (tileType == 1 || tileType == 9) {
+      return Container(
+        width: _tileSize,
+        height: _tileSize,
+        decoration: BoxDecoration(
+          color: color,
+          border: Border.all(color: color.withOpacity(0.7), width: 0.5),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              bottom: 0,
+              left: _tileSize * 0.1,
+              child: Text('🌿', style: TextStyle(fontSize: _tileSize * 0.4)),
+            ),
+            Positioned(
+              bottom: 0,
+              right: _tileSize * 0.1,
+              child: Text('🌱', style: TextStyle(fontSize: _tileSize * 0.35)),
+            ),
+          ],
+        ),
+      );
+    }
     
     return Container(
       width: _tileSize,
@@ -424,133 +480,216 @@ class _AdventureScreenState extends State<AdventureScreen>
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // 左邊資訊
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '座標: ($_playerX, $_playerY)',
-                  style: PixelTheme.pixelText(size: 7, color: PixelTheme.textDim),
-                ),
-                const SizedBox(height: 4),
-                if (_groundLayer[_playerY][_playerX] == 1)
-                  Text(
-                    '⚠️ 深草區域！',
-                    style: PixelTheme.pixelText(size: 7, color: PixelTheme.warning),
-                  ),
-              ],
-            ),
-          ),
+          // 搖杆
+          _buildJoystick(),
           
-          // D-Pad
-          SizedBox(
-            width: 150,
-            height: 150,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // 上
-                Positioned(
-                  top: 0,
-                  child: _buildDPadButton('▲', 3),
+          // 右邊資訊 + A/B 按鈕
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // 資訊
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: PixelTheme.bgMid,
+                  border: Border.all(color: PixelTheme.textDim, width: 2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                // 下
-                Positioned(
-                  bottom: 0,
-                  child: _buildDPadButton('▼', 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '座標: ($_playerX, $_playerY)',
+                      style: PixelTheme.pixelText(size: 7, color: PixelTheme.textDim),
+                    ),
+                    if (_groundLayer[_playerY][_playerX] == 1)
+                      Text(
+                        '⚠️ 深草區域！',
+                        style: PixelTheme.pixelText(size: 7, color: PixelTheme.warning),
+                      ),
+                  ],
                 ),
-                // 左
-                Positioned(
-                  left: 0,
-                  child: _buildDPadButton('◀', 1),
-                ),
-                // 右
-                Positioned(
-                  right: 0,
-                  child: _buildDPadButton('▶', 2),
-                ),
-                // 中心
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: PixelTheme.bgMid,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: PixelTheme.textDim, width: 2),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // 右邊 A/B 按鈕
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _buildActionButton('A', PixelTheme.primary, () {}),
-                const SizedBox(height: 8),
-                _buildActionButton('B', PixelTheme.error, () => Navigator.pop(context)),
-              ],
-            ),
+              ),
+              const SizedBox(height: 12),
+              // A/B 按鈕
+              Row(
+                children: [
+                  _buildActionButton('B', PixelTheme.error, () => Navigator.pop(context)),
+                  const SizedBox(width: 12),
+                  _buildActionButton('A', PixelTheme.primary, () {}),
+                ],
+              ),
+            ],
           ),
         ],
       ),
     );
   }
   
-  Widget _buildDPadButton(String label, int direction) {
+  // 搖杆狀態
+  Offset _joystickPosition = Offset.zero;
+  bool _joystickActive = false;
+  
+  Widget _buildJoystick() {
+    const double joystickSize = 130;
+    const double knobSize = 50;
+    const double maxDistance = (joystickSize - knobSize) / 2;
+    
     return GestureDetector(
-      onTap: () => _move(direction),
-      onLongPress: () async {
-        while (mounted && !_showEncounter) {
-          _move(direction);
-          await Future.delayed(const Duration(milliseconds: 150));
-        }
+      onPanStart: (details) {
+        setState(() => _joystickActive = true);
+      },
+      onPanUpdate: (details) {
+        final RenderBox box = context.findRenderObject() as RenderBox;
+        final center = Offset(joystickSize / 2, joystickSize / 2);
+        final localPosition = details.localPosition - center;
+        
+        // 限制在圓形範圍內
+        final distance = localPosition.distance;
+        final clampedDistance = distance.clamp(0.0, maxDistance);
+        final direction = distance > 0 ? localPosition / distance : Offset.zero;
+        
+        setState(() {
+          _joystickPosition = direction * clampedDistance;
+        });
+        
+        // 根據方向移動
+        _handleJoystickMove();
+      },
+      onPanEnd: (details) {
+        setState(() {
+          _joystickPosition = Offset.zero;
+          _joystickActive = false;
+        });
       },
       child: Container(
-        width: 45,
-        height: 45,
+        width: joystickSize,
+        height: joystickSize,
         decoration: BoxDecoration(
           color: PixelTheme.bgMid,
-          border: Border.all(color: PixelTheme.accent, width: 2),
-          borderRadius: BorderRadius.circular(6),
+          shape: BoxShape.circle,
+          border: Border.all(color: PixelTheme.accent, width: 4),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
         ),
-        child: Center(
-          child: Text(
-            label,
-            style: PixelTheme.pixelText(size: 16, color: PixelTheme.accent),
-          ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // 背景指示線
+            CustomPaint(
+              size: Size(joystickSize, joystickSize),
+              painter: _JoystickBackgroundPainter(),
+            ),
+            // 搖杆頭
+            Transform.translate(
+              offset: _joystickPosition,
+              child: Container(
+                width: knobSize,
+                height: knobSize,
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      PixelTheme.accent,
+                      PixelTheme.accent.withOpacity(0.7),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white.withOpacity(0.5), width: 3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: PixelTheme.accent.withOpacity(0.5),
+                      blurRadius: 15,
+                      spreadRadius: 3,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Container(
+                    width: 15,
+                    height: 15,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+  
+  DateTime? _lastMoveTime;
+  
+  void _handleJoystickMove() {
+    // 限制移動頻率
+    final now = DateTime.now();
+    if (_lastMoveTime != null && 
+        now.difference(_lastMoveTime!).inMilliseconds < 150) {
+      return;
+    }
+    
+    // 計算方向
+    if (_joystickPosition.distance < 15) return; // 死區
+    
+    final angle = _joystickPosition.direction;
+    int direction;
+    
+    if (angle > -0.785 && angle <= 0.785) {
+      direction = 2; // 右
+    } else if (angle > 0.785 && angle <= 2.356) {
+      direction = 0; // 下
+    } else if (angle > -2.356 && angle <= -0.785) {
+      direction = 3; // 上
+    } else {
+      direction = 1; // 左
+    }
+    
+    _move(direction);
+    _lastMoveTime = now;
   }
   
   Widget _buildActionButton(String label, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 45,
-        height: 45,
+        width: 50,
+        height: 50,
         decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+          gradient: RadialGradient(
+            colors: [
+              color,
+              color.withOpacity(0.7),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(color: Colors.white.withOpacity(0.4), width: 3),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.5),
-              blurRadius: 8,
-              spreadRadius: 1,
+              color: color.withOpacity(0.6),
+              blurRadius: 12,
+              spreadRadius: 2,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 5,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Center(
           child: Text(
             label,
-            style: PixelTheme.pixelText(size: 14, color: Colors.white),
+            style: PixelTheme.pixelText(size: 16, color: Colors.white),
           ),
         ),
       ),
@@ -595,6 +734,36 @@ class _AdventureScreenState extends State<AdventureScreen>
       },
     );
   }
+}
+
+// 搖杆背景繪製器
+class _JoystickBackgroundPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final paint = Paint()
+      ..color = PixelTheme.textDim.withOpacity(0.3)
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+    
+    // 畫十字線
+    canvas.drawLine(
+      Offset(center.dx, 15),
+      Offset(center.dx, size.height - 15),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(15, center.dy),
+      Offset(size.width - 15, center.dy),
+      paint,
+    );
+    
+    // 畫內圈
+    canvas.drawCircle(center, 20, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class Monster {
