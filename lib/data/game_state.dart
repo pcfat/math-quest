@@ -32,6 +32,9 @@ class GameState extends ChangeNotifier {
   String _avatarEmoji = '😊';
   int _level = 1;
   int _experience = 0;
+  String _userGrade = '';  // 用戶年級
+  String _questionLanguage = 'zh';  // 題目語言 (zh/en)
+  bool _hasChosenGrade = false;
   
   // Phase 4: 寵物系統
   Pet? _activePet;
@@ -58,6 +61,9 @@ class GameState extends ChangeNotifier {
   int get experience => _experience;
   int get experienceForNextLevel => level * 100;
   double get levelProgress => experience / experienceForNextLevel;
+  String get userGrade => _userGrade;
+  String get questionLanguage => _questionLanguage;
+  bool get hasChosenGrade => _hasChosenGrade;
   
   // 寵物 Getters
   Pet? get activePet => _activePet;
@@ -92,6 +98,21 @@ class GameState extends ChangeNotifier {
     _activePet = pet;
     _ownedPetIds.add(pet.id);
     _hasChosenStarterPet = true;
+    _saveProgress();
+    notifyListeners();
+  }
+  
+  // 設置用戶年級
+  void setUserGrade(String grade) {
+    _userGrade = grade;
+    _hasChosenGrade = true;
+    _saveProgress();
+    notifyListeners();
+  }
+  
+  // 設置題目語言
+  void setQuestionLanguage(String language) {
+    _questionLanguage = language;
     _saveProgress();
     notifyListeners();
   }
@@ -229,6 +250,11 @@ class GameState extends ChangeNotifier {
     _level = prefs.getInt('level') ?? 1;
     _experience = prefs.getInt('experience') ?? 0;
     
+    // 載入年級數據
+    _hasChosenGrade = prefs.getBool('hasChosenGrade') ?? false;
+    _userGrade = prefs.getString('userGrade') ?? '';
+    _questionLanguage = prefs.getString('questionLanguage') ?? 'zh';
+    
     // 載入寵物數據
     _hasChosenStarterPet = prefs.getBool('hasChosenStarterPet') ?? false;
     _ownedPetIds = prefs.getStringList('ownedPets') ?? [];
@@ -273,6 +299,11 @@ class GameState extends ChangeNotifier {
     prefs.setString('avatar', _avatarEmoji);
     prefs.setInt('level', _level);
     prefs.setInt('experience', _experience);
+    
+    // 儲存年級數據
+    prefs.setBool('hasChosenGrade', _hasChosenGrade);
+    prefs.setString('userGrade', _userGrade);
+    prefs.setString('questionLanguage', _questionLanguage);
     
     // 儲存寵物數據
     prefs.setBool('hasChosenStarterPet', _hasChosenStarterPet);

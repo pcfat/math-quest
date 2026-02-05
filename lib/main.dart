@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'data/game_state.dart';
 import 'screens/home_screen.dart';
+import 'screens/grade_selection_screen.dart';
 import 'screens/pet_selection_screen.dart';
 import 'theme/pixel_theme.dart';
 
@@ -65,7 +66,12 @@ class AppRouter extends StatelessWidget {
   Widget build(BuildContext context) {
     final gameState = context.watch<GameState>();
     
-    // 如果未選擇初始寵物，顯示選擇頁面
+    // 首先檢查是否已選擇年級
+    if (!gameState.hasChosenGrade) {
+      return const GradeSelectionScreen();
+    }
+    
+    // 然後檢查是否已選擇寵物
     if (!gameState.hasChosenStarterPet) {
       return const PetSelectionScreen();
     }

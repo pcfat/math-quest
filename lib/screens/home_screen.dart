@@ -220,9 +220,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: PixelTheme.primary.withOpacity(0.5),
-                  blurRadius: 30,
-                  spreadRadius: 5,
+                  color: Colors.white.withOpacity(0.6),
+                  blurRadius: 40,
+                  spreadRadius: 8,
                 ),
               ],
             ),
@@ -259,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           
           Text(
             '數學大冒險',
-            style: PixelTheme.pixelText(size: 12, color: PixelTheme.secondary),
+            style: PixelTheme.pixelText(size: 18, color: PixelTheme.secondary),
           ),
         ],
       ),
