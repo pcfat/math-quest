@@ -9,6 +9,7 @@ import 'daily_mission_screen.dart';
 import 'leaderboard_screen.dart';
 import 'achievements_screen.dart';
 import 'pet_collection_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -411,7 +412,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           _buildNavItem('👤', 'PROFILE', false, () {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
           }),
-          _buildNavItem('⚙️', 'SETTINGS', false, () {}),
+          _buildNavItem('⚙️', 'SETTINGS', false, () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+          }),
         ],
       ),
     );
