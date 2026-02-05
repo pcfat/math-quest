@@ -391,7 +391,13 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
   
-  // 增加經驗值
+  // 增加經驗值 (公開方法)
+  void addExperience(int exp) {
+    _addExperience(exp);
+    notifyListeners();
+  }
+  
+  // 增加經驗值 (內部方法)
   void _addExperience(int exp) {
     _experience += exp;
     while (_experience >= experienceForNextLevel) {

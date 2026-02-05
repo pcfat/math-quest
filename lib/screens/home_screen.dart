@@ -10,6 +10,7 @@ import 'leaderboard_screen.dart';
 import 'achievements_screen.dart';
 import 'pet_collection_screen.dart';
 import 'settings_screen.dart';
+import 'adventure_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -278,6 +279,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           height: 64,
           fontSize: 12,
           onPressed: () => _showGradeSelection(context),
+        ),
+        
+        const SizedBox(height: 16),
+        
+        // 冒險模式
+        PixelButton(
+          text: 'ADVENTURE',
+          emoji: '🗺️',
+          color: PixelTheme.secondary,
+          height: 56,
+          fontSize: 10,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AdventureScreen()),
+          ),
         ),
         
         const SizedBox(height: 16),
