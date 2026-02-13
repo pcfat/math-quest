@@ -207,7 +207,6 @@ class _PetSelectionScreenState extends State<PetSelectionScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: PixelTheme.pixelText(size: 7, color: color)),
-              // Progress bar with gradient
               Container(
                 width: 60,
                 height: 10,
