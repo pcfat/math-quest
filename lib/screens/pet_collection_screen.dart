@@ -318,12 +318,7 @@ class PetCollectionScreen extends StatelessWidget {
   }
   
   Color _getRarityColor(PetRarity rarity) {
-    switch (rarity) {
-      case PetRarity.common: return PixelTheme.textDim;
-      case PetRarity.rare: return PixelTheme.accent;
-      case PetRarity.epic: return const Color(0xFFa855f7);
-      case PetRarity.legendary: return PixelTheme.secondary;
-    }
+    return PixelTheme.getRarityColor(rarity.name);
   }
   
   void _showPetDetails(BuildContext context, Pet pet, bool isOwned) {

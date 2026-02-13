@@ -289,8 +289,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildMainMenu(BuildContext context) {
     return Column(
       children: [
-        // 開始遊戲 - 使用 glowButton
-        _buildGlowButton(
+        // 開始遊戲 - 使用 GlowButton
+        GlowButton(
           text: 'START GAME',
           emoji: '🎮',
           color: PixelTheme.primary,
@@ -302,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         const SizedBox(height: 16),
         
         // 冒險模式
-        _buildGlowButton(
+        GlowButton(
           text: 'ADVENTURE',
           emoji: '🗺️',
           color: PixelTheme.secondary,
@@ -317,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         const SizedBox(height: 16),
         
         // 計時挑戰
-        _buildGlowButton(
+        GlowButton(
           text: 'TIME ATTACK',
           emoji: '⏱️',
           color: PixelTheme.error,
@@ -326,44 +326,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           onPressed: () => _showGradeSelection(context, timed: true),
         ),
       ],
-    );
-  }
-  
-  Widget _buildGlowButton({
-    required String text,
-    required String emoji,
-    required Color color,
-    required double height,
-    required double fontSize,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      width: double.infinity,
-      height: height,
-      decoration: PixelTheme.glowButton(color: color),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(12),
-          child: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(emoji, style: TextStyle(fontSize: fontSize + 4)),
-                const SizedBox(width: 12),
-                Text(
-                  text,
-                  style: PixelTheme.pixelText(
-                    size: fontSize,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
   
@@ -568,7 +530,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Row(
               children: [
                 Expanded(
-                  child: _buildGlowButton(
+                  child: GlowButton(
                     text: 'JUNIOR',
                     emoji: '📗',
                     color: PixelTheme.primary,
@@ -587,7 +549,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildGlowButton(
+                  child: GlowButton(
                     text: 'SENIOR',
                     emoji: '📕',
                     color: PixelTheme.accent,

@@ -59,6 +59,21 @@ class PixelTheme {
     ],
   );
   
+  // 根據稀有度獲取顏色
+  static Color getRarityColor(String rarity) {
+    switch (rarity.toLowerCase()) {
+      case 'legendary':
+        return const Color(0xFFFFD700); // Gold
+      case 'epic':
+        return primary; // Purple
+      case 'rare':
+        return cyan; // Blue
+      case 'common':
+      default:
+        return textDim; // Gray
+    }
+  }
+  
   // 題目專用字體 (清晰易讀)
   static const String questionFont = 'Times New Roman';
   static const String questionFontChinese = 'PMingLiU';  // 新細明體

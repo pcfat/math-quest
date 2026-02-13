@@ -106,17 +106,9 @@ class AchievementsScreen extends StatelessWidget {
   }
   
   Widget _buildAchievementCard(dynamic achievement, bool isUnlocked) {
-    // Rarity-based glow colors - matches achievement.rarity string property
-    final rarityColors = {
-      'common': PixelTheme.textDim,
-      'rare': PixelTheme.accent,
-      'epic': const Color(0xFFa855f7),
-      'legendary': PixelTheme.secondary,
-    };
-    
-    // Default to secondary for unlocked, textDim for locked
+    // Use utility method for rarity color
     final rarityColor = isUnlocked 
-        ? (rarityColors[achievement.rarity] ?? PixelTheme.secondary)
+        ? PixelTheme.getRarityColor(achievement.rarity ?? 'common')
         : PixelTheme.textDim;
     
     return Container(

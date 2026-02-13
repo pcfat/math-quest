@@ -233,7 +233,8 @@ class XpProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = xpToNextLevel > 0 ? currentXp / xpToNextLevel : 1.0;
+    final progress = xpToNextLevel > 0 ? currentXp / xpToNextLevel : 0.0;
+    final isMaxLevel = xpToNextLevel == 0;
     
     return Row(
       children: [
@@ -298,7 +299,7 @@ class XpProgressBar extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '$currentXp / $xpToNextLevel XP',
+                    isMaxLevel ? 'MAX LEVEL' : '$currentXp / $xpToNextLevel XP',
                     style: PixelTheme.modernText(
                       size: 10,
                       color: levelColor,
@@ -319,7 +320,7 @@ class XpProgressBar extends StatelessWidget {
                   child: Stack(
                     children: [
                       FractionallySizedBox(
-                        widthFactor: progress.clamp(0.0, 1.0),
+                        widthFactor: isMaxLevel ? 1.0 : progress.clamp(0.0, 1.0),
                         child: Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -403,6 +404,58 @@ class StreakBadge extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 霓虹發光按鈕
+class GlowButton extends StatelessWidget {
+  final String text;
+  final String emoji;
+  final Color color;
+  final double height;
+  final double fontSize;
+  final VoidCallback onPressed;
+
+  const GlowButton({
+    super.key,
+    required this.text,
+    required this.emoji,
+    required this.color,
+    this.height = 56,
+    this.fontSize = 10,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: height,
+      decoration: PixelTheme.glowButton(color: color),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(12),
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(emoji, style: TextStyle(fontSize: fontSize + 4)),
+                const SizedBox(width: 12),
+                Text(
+                  text,
+                  style: PixelTheme.pixelText(
+                    size: fontSize,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

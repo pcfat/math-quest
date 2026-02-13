@@ -199,35 +199,13 @@ class _SplashScreenState extends State<SplashScreen>
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 48),
-                          child: Container(
-                            width: double.infinity,
+                          child: GlowButton(
+                            text: 'START GAME',
+                            emoji: '🎮',
+                            color: PixelTheme.primary,
                             height: 70,
-                            decoration: PixelTheme.glowButton(
-                              color: PixelTheme.primary,
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: _startGame,
-                                borderRadius: BorderRadius.circular(12),
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text('🎮', style: TextStyle(fontSize: 18)),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        'START GAME',
-                                        style: PixelTheme.pixelText(
-                                          size: 14,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
+                            fontSize: 14,
+                            onPressed: _startGame,
                           ),
                         ),
                       ),
