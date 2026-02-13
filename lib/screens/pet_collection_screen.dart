@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../data/game_state.dart';
 import '../models/pet_models.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 
 class PetCollectionScreen extends StatelessWidget {
   const PetCollectionScreen({super.key});
@@ -73,8 +74,11 @@ class PetCollectionScreen extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: PixelTheme.bgMid,
-                border: Border.all(color: PixelTheme.textDim, width: 3),
+                gradient: const LinearGradient(
+                  colors: [PixelTheme.bgCard, PixelTheme.bgMid],
+                ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: PixelTheme.textMuted.withOpacity(0.5), width: 2),
               ),
               child: const Center(
                 child: Text('←', style: TextStyle(
@@ -107,8 +111,32 @@ class PetCollectionScreen extends StatelessWidget {
   }
   
   Widget _buildActivePet(Pet pet) {
-    return PixelCard(
-      borderColor: PixelTheme.accent,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            PixelTheme.accent.withOpacity(0.15),
+            PixelTheme.bgCard,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: PixelTheme.accent.withOpacity(0.5), width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: PixelTheme.accent.withOpacity(0.3),
+            blurRadius: 16,
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           // 寵物圖標
@@ -116,8 +144,11 @@ class PetCollectionScreen extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: PixelTheme.accent.withOpacity(0.2),
-              border: Border.all(color: PixelTheme.accent, width: 3),
+              gradient: LinearGradient(
+                colors: [PixelTheme.accent.withOpacity(0.3), PixelTheme.accent.withOpacity(0.1)],
+              ),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: PixelTheme.accent.withOpacity(0.5), width: 2),
             ),
             child: Center(
               child: Text(pet.emoji, style: const TextStyle(fontSize: 48)),
@@ -176,6 +207,7 @@ class PetCollectionScreen extends StatelessWidget {
   Widget _buildPetCard(BuildContext context, Pet pet, bool isOwned) {
     final gameState = context.read<GameState>();
     final isActive = gameState.activePet?.id == pet.id;
+    final glowColor = _getRarityColor(pet.rarity);
     
     return GestureDetector(
       onTap: isOwned ? () => _showPetDetails(context, pet, isOwned) : null,
@@ -183,15 +215,52 @@ class PetCollectionScreen extends StatelessWidget {
         width: 100,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isOwned 
-              ? (isActive ? PixelTheme.accent.withOpacity(0.2) : PixelTheme.bgMid)
-              : PixelTheme.bgMid.withOpacity(0.5),
+          gradient: isOwned
+              ? (isActive 
+                  ? LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        PixelTheme.accent.withOpacity(0.2),
+                        PixelTheme.bgCard,
+                      ],
+                    )
+                  : LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        glowColor.withOpacity(0.1),
+                        PixelTheme.bgCard,
+                      ],
+                    ))
+              : const LinearGradient(
+                  colors: [PixelTheme.bgCard, PixelTheme.bgMid],
+                ),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isOwned 
-                ? (isActive ? PixelTheme.accent : _getRarityColor(pet.rarity))
-                : PixelTheme.textDim,
-            width: isActive ? 3 : 2,
+                ? (isActive ? PixelTheme.accent.withOpacity(0.6) : glowColor.withOpacity(0.5))
+                : PixelTheme.textMuted.withOpacity(0.3),
+            width: isActive ? 2.5 : 2,
           ),
+          boxShadow: isOwned ? [
+            BoxShadow(
+              color: (isActive ? PixelTheme.accent : glowColor).withOpacity(0.3),
+              blurRadius: isActive ? 16 : 12,
+              spreadRadius: 0,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ] : [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           children: [
@@ -230,15 +299,20 @@ class PetCollectionScreen extends StatelessWidget {
       PetRarity.legendary: 'SSR',
     };
     
+    final color = _getRarityColor(rarity);
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: _getRarityColor(rarity).withOpacity(0.2),
-        border: Border.all(color: _getRarityColor(rarity), width: 1),
+        gradient: LinearGradient(
+          colors: [color.withOpacity(0.3), color.withOpacity(0.1)],
+        ),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withOpacity(0.6), width: 1.5),
       ),
       child: Text(
         labels[rarity]!,
-        style: PixelTheme.pixelText(size: 6, color: _getRarityColor(rarity)),
+        style: PixelTheme.pixelText(size: 6, color: color),
       ),
     );
   }
@@ -255,13 +329,38 @@ class PetCollectionScreen extends StatelessWidget {
   void _showPetDetails(BuildContext context, Pet pet, bool isOwned) {
     final gameState = context.read<GameState>();
     final isActive = gameState.activePet?.id == pet.id;
+    final rarityColor = _getRarityColor(pet.rarity);
     
     showDialog(
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
-        child: PixelCard(
-          borderColor: _getRarityColor(pet.rarity),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                rarityColor.withOpacity(0.15),
+                PixelTheme.bgCard,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: rarityColor.withOpacity(0.5), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: rarityColor.withOpacity(0.3),
+                blurRadius: 20,
+                spreadRadius: 0,
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -270,8 +369,11 @@ class PetCollectionScreen extends StatelessWidget {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: _getRarityColor(pet.rarity).withOpacity(0.2),
-                  border: Border.all(color: _getRarityColor(pet.rarity), width: 3),
+                  gradient: LinearGradient(
+                    colors: [rarityColor.withOpacity(0.3), rarityColor.withOpacity(0.1)],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: rarityColor.withOpacity(0.5), width: 2),
                 ),
                 child: Center(
                   child: Text(pet.emoji, style: const TextStyle(fontSize: 60)),
@@ -281,7 +383,7 @@ class PetCollectionScreen extends StatelessWidget {
               const SizedBox(height: 16),
               
               // 名稱
-              Text(pet.name, style: PixelTheme.pixelTitle(size: 14, color: _getRarityColor(pet.rarity))),
+              Text(pet.name, style: PixelTheme.pixelTitle(size: 14, color: rarityColor)),
               const SizedBox(height: 4),
               _buildRarityBadge(pet.rarity),
               
@@ -377,8 +479,11 @@ class PetCollectionScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        border: Border.all(color: color, width: 2),
+        gradient: LinearGradient(
+          colors: [color.withOpacity(0.3), color.withOpacity(0.1)],
+        ),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.5), width: 2),
       ),
       child: Column(
         children: [

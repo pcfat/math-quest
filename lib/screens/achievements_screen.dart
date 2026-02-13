@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 
 class AchievementsScreen extends StatelessWidget {
   const AchievementsScreen({super.key});
@@ -68,8 +69,11 @@ class AchievementsScreen extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: PixelTheme.bgMid,
-                border: Border.all(color: PixelTheme.textDim, width: 3),
+                gradient: const LinearGradient(
+                  colors: [PixelTheme.bgCard, PixelTheme.bgMid],
+                ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: PixelTheme.textMuted.withOpacity(0.5), width: 2),
               ),
               child: const Center(
                 child: Text('←', style: TextStyle(
@@ -102,9 +106,57 @@ class AchievementsScreen extends StatelessWidget {
   }
   
   Widget _buildAchievementCard(dynamic achievement, bool isUnlocked) {
-    return PixelCard(
-      borderColor: isUnlocked ? PixelTheme.secondary : PixelTheme.textDim,
-      bgColor: isUnlocked ? PixelTheme.secondary.withOpacity(0.1) : PixelTheme.bgMid.withOpacity(0.5),
+    final rarityColors = {
+      'common': PixelTheme.textDim,
+      'rare': PixelTheme.accent,
+      'epic': const Color(0xFFa855f7),
+      'legendary': PixelTheme.secondary,
+    };
+    
+    // Default to secondary for unlocked, textDim for locked
+    final glowColor = isUnlocked 
+        ? (rarityColors[achievement.rarity] ?? PixelTheme.secondary)
+        : PixelTheme.textDim;
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: isUnlocked
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  glowColor.withOpacity(0.15),
+                  PixelTheme.bgCard,
+                ],
+              )
+            : const LinearGradient(
+                colors: [PixelTheme.bgCard, PixelTheme.bgMid],
+              ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isUnlocked ? glowColor.withOpacity(0.5) : PixelTheme.textMuted.withOpacity(0.3),
+          width: 2,
+        ),
+        boxShadow: isUnlocked ? [
+          BoxShadow(
+            color: glowColor.withOpacity(0.3),
+            blurRadius: 16,
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ] : [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           // Icon
@@ -112,12 +164,17 @@ class AchievementsScreen extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: isUnlocked 
-                  ? PixelTheme.secondary.withOpacity(0.3)
-                  : PixelTheme.bgLight,
+              gradient: isUnlocked 
+                  ? LinearGradient(
+                      colors: [glowColor.withOpacity(0.3), glowColor.withOpacity(0.1)],
+                    )
+                  : const LinearGradient(
+                      colors: [PixelTheme.bgLight, PixelTheme.bgMid],
+                    ),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isUnlocked ? PixelTheme.secondary : PixelTheme.textDim,
-                width: 3,
+                color: isUnlocked ? glowColor.withOpacity(0.5) : PixelTheme.textMuted,
+                width: 2,
               ),
             ),
             child: Center(
@@ -162,12 +219,20 @@ class AchievementsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: PixelTheme.primary.withOpacity(0.2),
-                border: Border.all(color: PixelTheme.primary, width: 2),
+                gradient: LinearGradient(
+                  colors: [PixelTheme.primary, PixelTheme.primary.withOpacity(0.8)],
+                ),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: PixelTheme.primary.withOpacity(0.4),
+                    blurRadius: 8,
+                  ),
+                ],
               ),
               child: const Text('✓', style: TextStyle(
                 fontSize: 16,
-                color: PixelTheme.primary,
+                color: Colors.white,
               )),
             )
           else
@@ -175,7 +240,8 @@ class AchievementsScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: PixelTheme.bgLight,
-                border: Border.all(color: PixelTheme.textDim, width: 2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: PixelTheme.textMuted, width: 1.5),
               ),
               child: Text('?', style: PixelTheme.pixelText(size: 10, color: PixelTheme.textDim)),
             ),
