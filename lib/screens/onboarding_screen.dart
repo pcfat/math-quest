@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/pixel_theme.dart';
 import '../theme/codedex_widgets.dart';
-import 'grade_selection_screen.dart';
+import 'avatar_builder_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -117,7 +117,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const GradeSelectionScreen(),
+          pageBuilder: (_, __, ___) => const AvatarBuilderScreen(),
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(opacity: animation, child: child);
           },
