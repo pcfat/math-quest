@@ -1,33 +1,62 @@
 import 'package:flutter/material.dart';
 
-/// Pixel Art 遊戲主題
+/// Pixel Art 遊戲主題 - 升級為 Codedex 風格
 class PixelTheme {
-  // 復古遊戲色板
-  static const Color bgDark = Color(0xFF1a1c2c);      // 深藍黑背景
-  static const Color bgMid = Color(0xFF262b44);       // 中間背景
-  static const Color bgLight = Color(0xFF3a4466);     // 淺背景
+  // Codedex 色板 - 霓虹色 + 太空黑
+  static const Color bgDark = Color(0xFF0D1117);      // 深太空黑背景
+  static const Color bgMid = Color(0xFF161B22);       // 中間背景 (卡片)
+  static const Color bgLight = Color(0xFF21262D);     // 淺背景
+  static const Color bgCard = Color(0xFF1C2333);      // 專用卡片背景
   
-  static const Color primary = Color(0xFF3bff6f);     // 亮綠 (生命條)
-  static const Color secondary = Color(0xFFffcd75);   // 金黃 (金幣/分數)
-  static const Color accent = Color(0xFF38b6ff);      // 天藍 (特殊)
+  static const Color primary = Color(0xFF6C63FF);     // 霓虹紫 (主色)
+  static const Color secondary = Color(0xFFFFD700);   // 金黃 (金幣/分數)
+  static const Color accent = Color(0xFF00D4AA);      // 青綠 (特殊)
+  static const Color pink = Color(0xFFFF6B9D);        // 粉紅
+  static const Color cyan = Color(0xFF38B6FF);        // 天藍
+  static const Color orange = Color(0xFFFF8C42);      // 橙色
   
-  static const Color textLight = Color(0xFFf4f4f4);   // 白色文字
-  static const Color textDim = Color(0xFF8b9bb4);     // 暗灰文字
+  static const Color textLight = Color(0xFFF0F6FC);   // 白色文字
+  static const Color textDim = Color(0xFF8B949E);     // 暗灰文字
+  static const Color textMuted = Color(0xFF484F58);   // 更暗的文字
   
-  static const Color success = Color(0xFF3bff6f);     // 答對
+  static const Color success = Color(0xFF00D4AA);     // 答對
   static const Color error = Color(0xFFff6b6b);       // 答錯
-  static const Color warning = Color(0xFFffcd75);     // 警告
+  static const Color warning = Color(0xFFFFD700);     // 警告
   
+  // 保留向後兼容的像素色
   static const Color pixel1 = Color(0xFF5fcde4);      // 青色
   static const Color pixel2 = Color(0xFFcbdbfc);      // 淺藍
   static const Color pixel3 = Color(0xFF9badb7);      // 灰藍
   static const Color pixel4 = Color(0xFF847e87);      // 暗灰
   
-  // 漸變背景
+  // Codedex 風格漸變背景
   static const LinearGradient bgGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [bgDark, Color(0xFF0f0f1e)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      bgDark,
+      Color(0xFF0D1520),
+      Color(0xFF0A0E1A),
+    ],
+  );
+  
+  // 紫色發光漸層
+  static const LinearGradient purpleGlow = LinearGradient(
+    colors: [
+      primary,
+      Color(0xFF8B7FFF),
+      Color(0xFFB4A3FF),
+    ],
+  );
+  
+  // 卡片專用漸層
+  static const LinearGradient cardGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      bgCard,
+      bgMid,
+    ],
   );
   
   // 題目專用字體 (清晰易讀)
@@ -51,7 +80,134 @@ class PixelTheme {
   // 像素字體
   static const String pixelFont = 'PressStart2P';
   
-  // 像素邊框裝飾
+  // Codedex 風格圓角卡片裝飾
+  static BoxDecoration codedexCard({
+    Color? color,
+    Color? borderColor,
+    double borderRadius = 16,
+    bool withGlow = false,
+  }) {
+    return BoxDecoration(
+      gradient: color != null 
+        ? null
+        : LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [bgCard, bgMid],
+          ),
+      color: color,
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(
+        color: borderColor ?? textMuted.withOpacity(0.3),
+        width: 1.5,
+      ),
+      boxShadow: withGlow
+        ? [
+            BoxShadow(
+              color: (borderColor ?? primary).withOpacity(0.3),
+              blurRadius: 16,
+              spreadRadius: 0,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ]
+        : [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+    );
+  }
+  
+  // 霓虹發光按鈕裝飾
+  static BoxDecoration glowButton({
+    required Color color,
+    double borderRadius = 12,
+  }) {
+    return BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(borderRadius),
+      boxShadow: [
+        BoxShadow(
+          color: color.withOpacity(0.6),
+          blurRadius: 20,
+          spreadRadius: 0,
+        ),
+        BoxShadow(
+          color: color.withOpacity(0.3),
+          blurRadius: 40,
+          spreadRadius: 5,
+        ),
+        BoxShadow(
+          color: Colors.black.withOpacity(0.3),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    );
+  }
+  
+  // Quest 進度卡片裝飾
+  static BoxDecoration questCard({
+    Color accentColor = primary,
+    bool isCompleted = false,
+    bool isLocked = false,
+  }) {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: isLocked 
+          ? [bgMid.withOpacity(0.5), bgCard.withOpacity(0.5)]
+          : [bgCard, bgMid],
+      ),
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(
+        color: isCompleted 
+          ? success.withOpacity(0.5)
+          : isLocked
+            ? textMuted.withOpacity(0.2)
+            : accentColor.withOpacity(0.3),
+        width: 2,
+      ),
+      boxShadow: [
+        if (!isLocked)
+          BoxShadow(
+            color: accentColor.withOpacity(0.2),
+            blurRadius: 12,
+            spreadRadius: 0,
+          ),
+        BoxShadow(
+          color: Colors.black.withOpacity(0.4),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    );
+  }
+  
+  // 現代清晰文字樣式 (用於內文)
+  static TextStyle modernText({
+    double size = 16,
+    Color color = textLight,
+    FontWeight weight = FontWeight.normal,
+    double? height,
+  }) {
+    return TextStyle(
+      fontSize: size,
+      color: color,
+      fontWeight: weight,
+      height: height ?? 1.5,
+      letterSpacing: 0.3,
+    );
+  }
+  
+  // 像素邊框裝飾 (向後兼容)
   static BoxDecoration pixelBorder({
     Color color = textLight,
     Color? bgColor,
@@ -107,7 +263,7 @@ class PixelTheme {
     );
   }
   
-  // 標題樣式
+  // 標題樣式 - 帶發光效果
   static TextStyle pixelTitle({double size = 16, Color color = textLight}) {
     return TextStyle(
       fontFamily: pixelFont,
@@ -115,6 +271,16 @@ class PixelTheme {
       color: color,
       height: 1.3,
       shadows: [
+        Shadow(
+          color: color.withOpacity(0.8),
+          offset: const Offset(0, 0),
+          blurRadius: 20,
+        ),
+        Shadow(
+          color: color.withOpacity(0.5),
+          offset: const Offset(0, 0),
+          blurRadius: 40,
+        ),
         Shadow(color: Colors.black, offset: const Offset(2, 2), blurRadius: 0),
       ],
     );
@@ -212,12 +378,13 @@ class _PixelButtonState extends State<PixelButton> {
   }
 }
 
-/// 像素風格卡片
+/// 像素風格卡片 - 更新為圓角 Codedex 風格
 class PixelCard extends StatelessWidget {
   final Widget child;
   final Color borderColor;
   final Color? bgColor;
   final EdgeInsets padding;
+  final bool rounded; // 新增: 是否使用圓角
 
   const PixelCard({
     super.key,
@@ -225,23 +392,29 @@ class PixelCard extends StatelessWidget {
     this.borderColor = PixelTheme.textDim,
     this.bgColor,
     this.padding = const EdgeInsets.all(16),
+    this.rounded = true, // 預設使用圓角
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
-      decoration: BoxDecoration(
-        color: bgColor ?? PixelTheme.bgMid,
-        border: Border.all(color: borderColor, width: 4),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            offset: const Offset(4, 4),
-            blurRadius: 0,
+      decoration: rounded
+        ? PixelTheme.codedexCard(
+            color: bgColor,
+            borderColor: borderColor,
+          )
+        : BoxDecoration(
+            color: bgColor ?? PixelTheme.bgMid,
+            border: Border.all(color: borderColor, width: 4),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                offset: const Offset(4, 4),
+                blurRadius: 0,
+              ),
+            ],
           ),
-        ],
-      ),
       child: child,
     );
   }
