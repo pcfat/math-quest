@@ -20,7 +20,7 @@ class AvatarBuilderScreen extends StatefulWidget {
 
 class _AvatarBuilderScreenState extends State<AvatarBuilderScreen>
     with SingleTickerProviderStateMixin {
-  late AvatarData _currentAvatar;
+  AvatarData _currentAvatar = AvatarData.defaultAvatar;
   int _selectedTab = 0;
   late TabController _tabController;
 
