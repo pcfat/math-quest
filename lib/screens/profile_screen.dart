@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
 import '../theme/codedex_widgets.dart';
+import '../models/avatar_data.dart';
+import '../widgets/avatar_widget.dart';
+import 'avatar_builder_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -13,17 +17,41 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _nameController = TextEditingController();
-  
-  final List<String> _avatars = [
-    '😊', '😎', '🤓', '🧑‍🎓', '👨‍💻', '👩‍🏫', '🦸', '🧙',
-    '🐱', '🐶', '🦊', '🐼', '🐨', '🦁', '🐯', '🐮',
-    '👾', '🤖', '👻', '💀', '🎮', '🕹️', '🎯', '🏆',
-  ];
+  AvatarData? _currentAvatar;
 
   @override
   void initState() {
     super.initState();
     _nameController.text = context.read<GameState>().username;
+    _loadAvatar();
+  }
+
+  Future<void> _loadAvatar() async {
+    final prefs = await SharedPreferences.getInstance();
+    final avatarJson = prefs.getString('user_avatar');
+    
+    if (mounted) {
+      setState(() {
+        if (avatarJson != null) {
+          _currentAvatar = AvatarData.fromJsonString(avatarJson);
+        } else {
+          _currentAvatar = AvatarData.defaultAvatar;
+        }
+      });
+    }
+  }
+
+  void _editAvatar() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AvatarBuilderScreen(isEditMode: true),
+      ),
+    );
+    
+    if (result == true) {
+      _loadAvatar();
+    }
   }
 
   @override
@@ -109,32 +137,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Column(
         children: [
-          // 頭像
+          // 頭像 - 使用 AvatarWidget
           GestureDetector(
-            onTap: () => _showAvatarPicker(context),
+            onTap: _editAvatar,
             child: Stack(
               alignment: Alignment.bottomRight,
               children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [PixelTheme.secondary, PixelTheme.secondaryGlow],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: PixelTheme.secondary.withOpacity(0.5), width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: PixelTheme.secondary.withOpacity(0.4),
-                        blurRadius: 20,
+                if (_currentAvatar != null)
+                  AvatarWidget(
+                    data: _currentAvatar!,
+                    size: 100,
+                  )
+                else
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [PixelTheme.secondary, PixelTheme.secondaryGlow],
                       ),
-                    ],
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: PixelTheme.secondary.withOpacity(0.5), width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: PixelTheme.secondary.withOpacity(0.4),
+                          blurRadius: 20,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(gameState.avatarEmoji, style: const TextStyle(fontSize: 40)),
+                    ),
                   ),
-                  child: Center(
-                    child: Text(gameState.avatarEmoji, style: const TextStyle(fontSize: 40)),
-                  ),
-                ),
                 Container(
                   width: 28,
                   height: 28,
@@ -148,6 +182,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // 編輯角色按鈕
+          GestureDetector(
+            onTap: _editAvatar,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: PixelTheme.codedexCard(
+                borderColor: PixelTheme.accent.withOpacity(0.5),
+                borderRadius: 8,
+              ),
+              child: Text(
+                '編輯角色',
+                style: PixelTheme.pixelText(
+                  size: 8,
+                  color: PixelTheme.accent,
+                ),
+              ),
             ),
           ),
           
@@ -263,55 +318,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ],
-      ),
-    );
-  }
-  
-  void _showAvatarPicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: PixelTheme.bgMid,
-          border: Border(top: BorderSide(color: PixelTheme.textDim, width: 4)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('SELECT AVATAR', style: PixelTheme.pixelTitle(size: 12)),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _avatars.map((emoji) {
-                final isSelected = context.read<GameState>().avatarEmoji == emoji;
-                return GestureDetector(
-                  onTap: () {
-                    context.read<GameState>().setAvatar(emoji);
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: isSelected ? PixelTheme.accent.withOpacity(0.3) : PixelTheme.bgLight,
-                      border: Border.all(
-                        color: isSelected ? PixelTheme.accent : PixelTheme.textDim,
-                        width: 3,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(emoji, style: const TextStyle(fontSize: 24)),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
       ),
     );
   }

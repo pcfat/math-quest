@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
 import '../theme/codedex_widgets.dart';
+import 'avatar_builder_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -283,6 +284,57 @@ class _SettingsScreenState extends State<SettingsScreen>
       decoration: PixelTheme.codedexCard(),
       child: Column(
         children: [
+          // 更改角色選項
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AvatarBuilderScreen(isEditMode: true),
+                ),
+              );
+            },
+            child: Row(
+              children: [
+                const Text('✨', style: TextStyle(fontSize: 20)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '更改角色',
+                    style: PixelTheme.pixelText(size: 10, color: PixelTheme.textLight),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: PixelTheme.accent.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: PixelTheme.accent,
+                      width: 2,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'EDIT',
+                        style: PixelTheme.pixelText(
+                          size: 8,
+                          color: PixelTheme.accent,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.arrow_forward, color: PixelTheme.accent, size: 12),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Divider(color: PixelTheme.textDim.withOpacity(0.3), height: 1),
+          const SizedBox(height: 12),
           _buildSettingRow('🔊', '音效', true),
           const SizedBox(height: 12),
           Divider(color: PixelTheme.textDim.withOpacity(0.3), height: 1),

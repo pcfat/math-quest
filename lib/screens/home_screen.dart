@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' as math;
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
 import '../theme/codedex_widgets.dart';
+import '../models/avatar_data.dart';
+import '../widgets/avatar_widget.dart';
 import 'topic_list_screen.dart';
 import 'profile_screen.dart';
 import 'daily_mission_screen.dart';
@@ -12,6 +15,7 @@ import 'achievements_screen.dart';
 import 'pet_collection_screen.dart';
 import 'settings_screen.dart';
 import 'adventure_screen.dart';
+import 'avatar_builder_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +27,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _floatController;
   late AnimationController _starController;
+  AvatarData? _currentAvatar;
 
   @override
   void initState() {
@@ -36,6 +41,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       duration: const Duration(seconds: 10),
       vsync: this,
     )..repeat();
+    
+    _loadAvatar();
   }
 
   @override
@@ -43,6 +50,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _floatController.dispose();
     _starController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadAvatar() async {
+    final prefs = await SharedPreferences.getInstance();
+    final avatarJson = prefs.getString('user_avatar');
+    
+    if (mounted) {
+      setState(() {
+        if (avatarJson != null) {
+          _currentAvatar = AvatarData.fromJsonString(avatarJson);
+        } else {
+          _currentAvatar = AvatarData.defaultAvatar;
+        }
+      });
+    }
+  }
+
+  void _editAvatar() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AvatarBuilderScreen(isEditMode: true),
+      ),
+    );
+    
+    if (result == true) {
+      _loadAvatar();
+    }
   }
 
   @override
@@ -145,34 +180,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           
           const SizedBox(width: 8),
           
-          // 玩家頭像和等級 - 使用 StatBadge 風格
+          // 玩家頭像和等級 - 點擊編輯角色
           GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfileScreen()),
-            ),
+            onTap: _editAvatar,
             child: Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [PixelTheme.secondary, PixelTheme.secondaryGlow],
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: PixelTheme.secondary.withOpacity(0.5), width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: PixelTheme.secondary.withOpacity(0.3),
-                        blurRadius: 12,
+                if (_currentAvatar != null)
+                  AvatarWidget(
+                    data: _currentAvatar!,
+                    size: 44,
+                    showGlow: false,
+                  )
+                else
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [PixelTheme.secondary, PixelTheme.secondaryGlow],
                       ),
-                    ],
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: PixelTheme.secondary.withOpacity(0.5), width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: PixelTheme.secondary.withOpacity(0.3),
+                          blurRadius: 12,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(gameState.avatarEmoji, style: const TextStyle(fontSize: 24)),
+                    ),
                   ),
-                  child: Center(
-                    child: Text(gameState.avatarEmoji, style: const TextStyle(fontSize: 24)),
-                  ),
-                ),
                 const SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
