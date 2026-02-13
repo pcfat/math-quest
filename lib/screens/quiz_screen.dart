@@ -4,6 +4,7 @@ import 'dart:async';
 import '../data/game_state.dart';
 import '../models/pet_models.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 import 'result_screen.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -121,7 +122,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                       ...List.generate(question.options.length, (index) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
-                          child: PixelOptionButton(
+                          child: _buildOptionButton(
                             label: ['A', 'B', 'C', 'D'][index],
                             text: question.options[index],
                             isSelected: _selectedIndex == index,
@@ -154,9 +155,8 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: PixelTheme.bgMid,
-        border: Border.all(color: PixelTheme.textDim, width: 3),
+      decoration: PixelTheme.codedexCard(
+        borderColor: PixelTheme.textMuted.withOpacity(0.5),
       ),
       child: Row(
         children: [
@@ -250,11 +250,14 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: isPlayer 
-                      ? PixelTheme.accent.withOpacity(0.2)
-                      : PixelTheme.error.withOpacity(0.2),
+                  gradient: LinearGradient(
+                    colors: isPlayer 
+                        ? [PixelTheme.accent.withOpacity(0.3), PixelTheme.accent.withOpacity(0.1)]
+                        : [PixelTheme.error.withOpacity(0.3), PixelTheme.error.withOpacity(0.1)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isPlayer ? PixelTheme.accent : PixelTheme.error,
+                    color: isPlayer ? PixelTheme.accent.withOpacity(0.5) : PixelTheme.error.withOpacity(0.5),
                     width: 2,
                   ),
                 ),
@@ -330,8 +333,11 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: PixelTheme.bgMid,
-                border: Border.all(color: PixelTheme.error, width: 3),
+                gradient: const LinearGradient(
+                  colors: [PixelTheme.bgCard, PixelTheme.bgMid],
+                ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: PixelTheme.error.withOpacity(0.5), width: 2),
               ),
               child: const Center(
                 child: Text('✕', style: TextStyle(fontSize: 18, color: PixelTheme.error)),
@@ -389,6 +395,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
   }
   
   Widget _buildProgressBar(GameState gameState) {
+    final progress = (gameState.currentQuestionIndex + 1) / gameState.totalQuestions;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -407,10 +414,36 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
             ],
           ),
           const SizedBox(height: 6),
-          PixelProgressBar(
-            value: (gameState.currentQuestionIndex + 1) / gameState.totalQuestions,
-            fillColor: PixelTheme.accent,
-            height: 16,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              height: 16,
+              decoration: BoxDecoration(
+                color: PixelTheme.bgLight,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Stack(
+                children: [
+                  FractionallySizedBox(
+                    widthFactor: progress.clamp(0.0, 1.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [PixelTheme.accent, PixelTheme.purple],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: PixelTheme.accent.withOpacity(0.5),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -418,9 +451,12 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
   }
   
   Widget _buildQuestionCard(question) {
-    return PixelCard(
-      borderColor: PixelTheme.textLight,
+    return Container(
       padding: const EdgeInsets.all(16),
+      decoration: PixelTheme.codedexCard(
+        borderColor: PixelTheme.textLight.withOpacity(0.5),
+        withGlow: true,
+      ),
       child: Column(
         children: [
           // 難度星星
@@ -464,30 +500,118 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
     }
   }
   
+  Widget _buildOptionButton({
+    required String label,
+    required String text,
+    required bool isSelected,
+    required bool isCorrect,
+    required bool isWrong,
+    required bool showResult,
+    required VoidCallback? onTap,
+  }) {
+    Color borderColor = PixelTheme.textMuted.withOpacity(0.5);
+    Color? glowColor;
+    
+    if (showResult) {
+      if (isCorrect) {
+        borderColor = PixelTheme.success.withOpacity(0.8);
+        glowColor = PixelTheme.success;
+      } else if (isWrong) {
+        borderColor = PixelTheme.error.withOpacity(0.8);
+        glowColor = PixelTheme.error;
+      }
+    } else if (isSelected) {
+      borderColor = PixelTheme.primary.withOpacity(0.8);
+      glowColor = PixelTheme.primary;
+    }
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [PixelTheme.bgCard, PixelTheme.bgMid],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor, width: 2),
+          boxShadow: glowColor != null ? [
+            BoxShadow(
+              color: glowColor.withOpacity(0.4),
+              blurRadius: 12,
+              spreadRadius: 0,
+            ),
+          ] : null,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: showResult 
+                    ? (isCorrect ? PixelTheme.success : isWrong ? PixelTheme.error : PixelTheme.bgLight)
+                    : isSelected ? PixelTheme.primary : PixelTheme.bgLight,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: glowColor != null ? [
+                  BoxShadow(
+                    color: glowColor.withOpacity(0.5),
+                    blurRadius: 8,
+                  ),
+                ] : null,
+              ),
+              child: Center(
+                child: Text(
+                  label,
+                  style: PixelTheme.pixelText(
+                    size: 10,
+                    color: (showResult && (isCorrect || isWrong)) || isSelected 
+                        ? Colors.white 
+                        : PixelTheme.textDim,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                text,
+                style: PixelTheme.questionText(size: 14),
+              ),
+            ),
+            if (showResult && isCorrect)
+              const Text('✓', style: TextStyle(fontSize: 20, color: PixelTheme.success)),
+            if (showResult && isWrong)
+              const Text('✕', style: TextStyle(fontSize: 20, color: PixelTheme.error)),
+          ],
+        ),
+      ),
+    );
+  }
+  
   Widget _buildExplanation(String explanation) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      child: PixelCard(
-        borderColor: PixelTheme.accent,
-        bgColor: PixelTheme.accent.withOpacity(0.1),
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('💡', style: TextStyle(fontSize: 18)),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('HINT', style: PixelTheme.pixelText(size: 7, color: PixelTheme.accent)),
-                  const SizedBox(height: 6),
-                  Text(explanation, style: PixelTheme.questionText(size: 14, height: 1.6)),
-                ],
-              ),
+      padding: const EdgeInsets.all(12),
+      decoration: PixelTheme.codedexCard(
+        borderColor: PixelTheme.accent.withOpacity(0.5),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('💡', style: TextStyle(fontSize: 18)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('HINT', style: PixelTheme.pixelText(size: 7, color: PixelTheme.accent)),
+                const SizedBox(height: 6),
+                Text(explanation, style: PixelTheme.questionText(size: 14, height: 1.6)),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -539,14 +663,29 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
           const Spacer(),
           
           // 下一題按鈕
-          PixelButton(
-            text: gameState.isLastQuestion ? 'FINISH' : 'NEXT',
-            emoji: gameState.isLastQuestion ? '🏆' : '▶',
-            color: PixelTheme.primary,
-            width: 130,
-            height: 48,
-            fontSize: 10,
-            onPressed: _nextQuestion,
+          GestureDetector(
+            onTap: _nextQuestion,
+            child: Container(
+              width: 130,
+              height: 48,
+              decoration: PixelTheme.glowButton(color: PixelTheme.primary),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      gameState.isLastQuestion ? '🏆' : '▶',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      gameState.isLastQuestion ? 'FINISH' : 'NEXT',
+                      style: PixelTheme.pixelText(size: 10, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import '../data/game_state.dart';
 import '../data/questions_data.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 import 'adventure_screen.dart';
 
 class AdventureBattleScreen extends StatefulWidget {
@@ -238,7 +239,7 @@ class _AdventureBattleScreenState extends State<AdventureBattleScreen>
           // 怪物血條
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: PixelHealthBar(
+            child: _buildGradientHealthBar(
               current: _monsterHp,
               max: _monsterMaxHp,
               color: PixelTheme.error,
@@ -263,17 +264,10 @@ class _AdventureBattleScreenState extends State<AdventureBattleScreen>
             },
             child: Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: PixelTheme.bgMid,
-                border: Border.all(color: PixelTheme.error, width: 4),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: PixelTheme.error.withOpacity(0.5),
-                    blurRadius: 20,
-                    spreadRadius: 5,
-                  ),
-                ],
+              decoration: PixelTheme.codedexCard(
+                borderColor: PixelTheme.error,
+                borderRadius: 20,
+                withGlow: true,
               ),
               child: Text(
                 widget.monster.emoji,
@@ -296,9 +290,11 @@ class _AdventureBattleScreenState extends State<AdventureBattleScreen>
       child: Column(
         children: [
           // 題目
-          PixelCard(
-            borderColor: PixelTheme.accent,
+          Container(
             padding: const EdgeInsets.all(16),
+            decoration: PixelTheme.codedexCard(
+              borderColor: PixelTheme.accent,
+            ),
             child: Text(
               _currentQuestion!['question'],
               style: PixelTheme.questionText(size: 18),
@@ -340,9 +336,10 @@ class _AdventureBattleScreenState extends State<AdventureBattleScreen>
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
+                      decoration: PixelTheme.codedexCard(
                         color: bgColor,
-                        border: Border.all(color: borderColor, width: 3),
+                        borderColor: borderColor,
+                        borderRadius: 12,
                       ),
                       child: Row(
                         children: [
@@ -351,6 +348,7 @@ class _AdventureBattleScreenState extends State<AdventureBattleScreen>
                             height: 32,
                             decoration: BoxDecoration(
                               color: borderColor,
+                              borderRadius: BorderRadius.circular(6),
                               border: Border.all(color: Colors.black, width: 2),
                             ),
                             child: Center(
@@ -431,6 +429,7 @@ class _AdventureBattleScreenState extends State<AdventureBattleScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: PixelTheme.primary, width: 2),
               ),
               child: Text(
@@ -450,7 +449,7 @@ class _AdventureBattleScreenState extends State<AdventureBattleScreen>
                     style: PixelTheme.pixelText(size: 10, color: PixelTheme.textLight),
                   ),
                   const SizedBox(height: 4),
-                  PixelHealthBar(
+                  _buildGradientHealthBar(
                     current: _playerHp,
                     max: _playerMaxHp,
                     color: PixelTheme.primary,
@@ -477,9 +476,12 @@ class _AdventureBattleScreenState extends State<AdventureBattleScreen>
         builder: (context, value, child) {
           return Transform.scale(scale: value, child: child);
         },
-        child: PixelCard(
-          borderColor: _playerWon ? PixelTheme.success : PixelTheme.error,
+        child: Container(
           padding: const EdgeInsets.all(32),
+          decoration: PixelTheme.codedexCard(
+            borderColor: _playerWon ? PixelTheme.success : PixelTheme.error,
+            withGlow: true,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -505,9 +507,9 @@ class _AdventureBattleScreenState extends State<AdventureBattleScreen>
               // 戰鬥統計
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: PixelTheme.bgLight,
-                  border: Border.all(color: PixelTheme.textDim, width: 2),
+                decoration: PixelTheme.codedexCard(
+                  borderColor: PixelTheme.textDim,
+                  borderRadius: 12,
                 ),
                 child: Column(
                   children: [
@@ -539,6 +541,60 @@ class _AdventureBattleScreenState extends State<AdventureBattleScreen>
       children: [
         Text(label, style: PixelTheme.pixelText(size: 10, color: PixelTheme.textDim)),
         Text(value, style: PixelTheme.pixelText(size: 10, color: PixelTheme.secondary)),
+      ],
+    );
+  }
+  
+  Widget _buildGradientHealthBar({
+    required int current,
+    required int max,
+    required Color color,
+    required String emoji,
+  }) {
+    final progress = max > 0 ? current / max : 0.0;
+    
+    return Row(
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 20)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Container(
+            height: 20,
+            decoration: BoxDecoration(
+              color: PixelTheme.bgLight,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: color.withOpacity(0.3), width: 2),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Stack(
+                children: [
+                  FractionallySizedBox(
+                    widthFactor: progress.clamp(0.0, 1.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [color, color.withOpacity(0.7)],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: color.withOpacity(0.5),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '$current/$max',
+          style: PixelTheme.pixelText(size: 8, color: color),
+        ),
       ],
     );
   }

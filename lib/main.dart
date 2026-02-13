@@ -46,8 +46,12 @@ class MathGameApp extends StatelessWidget {
             bodyMedium: TextStyle(color: PixelTheme.textLight),
           ),
           colorScheme: ColorScheme.fromSeed(
-            seedColor: PixelTheme.primary,
+            seedColor: PixelTheme.primary, // 霓虹紫
             brightness: Brightness.dark,
+            primary: PixelTheme.primary,
+            secondary: PixelTheme.secondary,
+            surface: PixelTheme.bgMid,
+            background: PixelTheme.bgDark,
           ),
         ),
         home: const SplashScreen(),

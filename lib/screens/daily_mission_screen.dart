@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 import 'topic_list_screen.dart';
 
 class DailyMissionScreen extends StatelessWidget {
@@ -62,7 +63,8 @@ class DailyMissionScreen extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: PixelTheme.bgMid,
-                border: Border.all(color: PixelTheme.textDim, width: 3),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: PixelTheme.textDim.withOpacity(0.5), width: 2),
               ),
               child: const Center(
                 child: Text('←', style: TextStyle(
@@ -86,9 +88,11 @@ class DailyMissionScreen extends StatelessWidget {
     final now = DateTime.now();
     final weekdays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
     
-    return PixelCard(
-      borderColor: PixelTheme.accent,
+    return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      decoration: PixelTheme.codedexCard(
+        borderColor: PixelTheme.accent.withOpacity(0.5),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -112,8 +116,12 @@ class DailyMissionScreen extends StatelessWidget {
   }
   
   Widget _buildMissionCard(BuildContext context, GameState gameState, dynamic mission) {
-    return PixelCard(
-      borderColor: mission.isCompleted ? PixelTheme.primary : PixelTheme.secondary,
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: PixelTheme.questCard(
+        accentColor: mission.isCompleted ? PixelTheme.primary : PixelTheme.secondary,
+        isCompleted: mission.isCompleted,
+      ),
       child: Column(
         children: [
           // Status icon
@@ -126,7 +134,18 @@ class DailyMissionScreen extends StatelessWidget {
                     ? [PixelTheme.primary, PixelTheme.primary.withOpacity(0.6)]
                     : [PixelTheme.secondary, PixelTheme.secondary.withOpacity(0.6)],
               ),
-              border: Border.all(color: Colors.black54, width: 3),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: mission.isCompleted ? PixelTheme.primary : PixelTheme.secondary,
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: (mission.isCompleted ? PixelTheme.primary : PixelTheme.secondary).withOpacity(0.5),
+                  blurRadius: 16,
+                  spreadRadius: 0,
+                ),
+              ],
             ),
             child: Center(
               child: Text(
@@ -155,12 +174,25 @@ class DailyMissionScreen extends StatelessWidget {
           
           const SizedBox(height: 20),
           
-          // Reward
+          // Reward with glow effect
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: PixelTheme.secondary.withOpacity(0.2),
-              border: Border.all(color: PixelTheme.secondary, width: 2),
+              gradient: LinearGradient(
+                colors: [
+                  PixelTheme.secondary.withOpacity(0.2),
+                  PixelTheme.secondary.withOpacity(0.1),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: PixelTheme.secondary.withOpacity(0.5), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: PixelTheme.secondary.withOpacity(0.4),
+                  blurRadius: 12,
+                  spreadRadius: 0,
+                ),
+              ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -183,7 +215,8 @@ class DailyMissionScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
                 color: PixelTheme.primary.withOpacity(0.2),
-                border: Border.all(color: PixelTheme.primary, width: 3),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: PixelTheme.primary, width: 2),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -213,8 +246,11 @@ class DailyMissionScreen extends StatelessWidget {
   }
   
   Widget _buildStatsCard(GameState gameState) {
-    return PixelCard(
-      borderColor: PixelTheme.accent,
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: PixelTheme.codedexCard(
+        borderColor: PixelTheme.accent.withOpacity(0.5),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -222,7 +258,17 @@ class DailyMissionScreen extends StatelessWidget {
           Container(
             width: 2,
             height: 50,
-            color: PixelTheme.textDim,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  PixelTheme.textDim.withOpacity(0.2),
+                  PixelTheme.textDim,
+                  PixelTheme.textDim.withOpacity(0.2),
+                ],
+              ),
+            ),
           ),
           _buildStatItem('🔥', '${gameState.progress.streak}', 'STREAK'),
         ],

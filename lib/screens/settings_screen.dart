@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -140,6 +141,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: PixelTheme.bgLight,
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: PixelTheme.textDim, width: 2),
               ),
               child: const Icon(Icons.arrow_back, color: PixelTheme.textLight, size: 20),
@@ -163,9 +165,9 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
   
   Widget _buildSectionHeader(String title, String subtitle, String emoji) {
-    return PixelCard(
+    return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      borderColor: PixelTheme.accent,
+      decoration: PixelTheme.codedexCard(borderColor: PixelTheme.accent),
       child: Row(
         children: [
           Text(emoji, style: const TextStyle(fontSize: 24)),
@@ -199,24 +201,11 @@ class _SettingsScreenState extends State<SettingsScreen>
         duration: const Duration(milliseconds: 200),
         width: 100,
         padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: isSelected 
-              ? PixelTheme.primary.withOpacity(0.2)
-              : PixelTheme.bgMid,
-          border: Border.all(
-            color: isSelected ? PixelTheme.primary : PixelTheme.textDim,
-            width: isSelected ? 4 : 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected 
-                  ? PixelTheme.primary.withOpacity(0.4)
-                  : Colors.black.withOpacity(0.3),
-              blurRadius: isSelected ? 15 : 5,
-              spreadRadius: isSelected ? 2 : 0,
-              offset: const Offset(0, 4),
-            ),
-          ],
+        decoration: PixelTheme.codedexCard(
+          color: isSelected ? PixelTheme.primary.withOpacity(0.2) : null,
+          borderColor: isSelected ? PixelTheme.primary : PixelTheme.textDim,
+          borderRadius: 12,
+          withGlow: isSelected,
         ),
         child: Column(
           children: [
@@ -258,24 +247,11 @@ class _SettingsScreenState extends State<SettingsScreen>
                 right: lang['id'] == 'zh' ? 8 : 0,
               ),
               padding: const EdgeInsets.symmetric(vertical: 20),
-              decoration: BoxDecoration(
-                color: isSelected 
-                    ? PixelTheme.accent.withOpacity(0.2)
-                    : PixelTheme.bgMid,
-                border: Border.all(
-                  color: isSelected ? PixelTheme.accent : PixelTheme.textDim,
-                  width: isSelected ? 4 : 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: isSelected 
-                        ? PixelTheme.accent.withOpacity(0.4)
-                        : Colors.black.withOpacity(0.3),
-                    blurRadius: isSelected ? 15 : 5,
-                    spreadRadius: isSelected ? 2 : 0,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+              decoration: PixelTheme.codedexCard(
+                color: isSelected ? PixelTheme.accent.withOpacity(0.2) : null,
+                borderColor: isSelected ? PixelTheme.accent : PixelTheme.textDim,
+                borderRadius: 12,
+                withGlow: isSelected,
               ),
               child: Column(
                 children: [
@@ -302,8 +278,9 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
   
   Widget _buildOtherSettings() {
-    return PixelCard(
+    return Container(
       padding: const EdgeInsets.all(16),
+      decoration: PixelTheme.codedexCard(),
       child: Column(
         children: [
           _buildSettingRow('🔊', '音效', true),
@@ -335,6 +312,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: enabled ? PixelTheme.primary.withOpacity(0.2) : PixelTheme.bgLight,
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: enabled ? PixelTheme.primary : PixelTheme.textDim,
               width: 2,
@@ -387,9 +365,12 @@ class _SettingsScreenState extends State<SettingsScreen>
             child: child,
           );
         },
-        child: PixelCard(
+        child: Container(
           padding: const EdgeInsets.all(32),
-          borderColor: PixelTheme.primary,
+          decoration: PixelTheme.codedexCard(
+            borderColor: PixelTheme.primary,
+            withGlow: true,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 import 'pet_selection_screen.dart';
 
 class GradeSelectionScreen extends StatefulWidget {
@@ -226,24 +227,13 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen>
         duration: const Duration(milliseconds: 200),
         width: 100,
         padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
+        decoration: PixelTheme.codedexCard(
           color: isSelected 
               ? PixelTheme.primary.withOpacity(0.2)
-              : PixelTheme.bgMid,
-          border: Border.all(
-            color: isSelected ? PixelTheme.primary : PixelTheme.textDim,
-            width: isSelected ? 4 : 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected 
-                  ? PixelTheme.primary.withOpacity(0.4)
-                  : Colors.black.withOpacity(0.3),
-              blurRadius: isSelected ? 15 : 5,
-              spreadRadius: isSelected ? 2 : 0,
-              offset: const Offset(0, 4),
-            ),
-          ],
+              : null,
+          borderColor: isSelected ? PixelTheme.primary : PixelTheme.textMuted,
+          borderRadius: 12,
+          withGlow: isSelected,
         ),
         child: Column(
           children: [
@@ -295,24 +285,13 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen>
                   right: lang['id'] == 'zh' ? 8 : 0,
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 24),
-                decoration: BoxDecoration(
+                decoration: PixelTheme.codedexCard(
                   color: isSelected 
                       ? PixelTheme.accent.withOpacity(0.2)
-                      : PixelTheme.bgMid,
-                  border: Border.all(
-                    color: isSelected ? PixelTheme.accent : PixelTheme.textDim,
-                    width: isSelected ? 4 : 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isSelected 
-                          ? PixelTheme.accent.withOpacity(0.4)
-                          : Colors.black.withOpacity(0.3),
-                      blurRadius: isSelected ? 15 : 5,
-                      spreadRadius: isSelected ? 2 : 0,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                      : null,
+                  borderColor: isSelected ? PixelTheme.accent : PixelTheme.textMuted,
+                  borderRadius: 12,
+                  withGlow: isSelected,
                 ),
                 child: Column(
                   children: [

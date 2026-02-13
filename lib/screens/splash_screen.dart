@@ -124,14 +124,19 @@ class _SplashScreenState extends State<SplashScreen>
                           decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                color: PixelTheme.primary.withOpacity(0.3),
-                                blurRadius: 60,
-                                spreadRadius: 20,
+                                color: PixelTheme.primary.withOpacity(0.6),
+                                blurRadius: 80,
+                                spreadRadius: 30,
                               ),
                               BoxShadow(
-                                color: Colors.white.withOpacity(0.5),
-                                blurRadius: 40,
-                                spreadRadius: 5,
+                                color: PixelTheme.primary.withOpacity(0.4),
+                                blurRadius: 120,
+                                spreadRadius: 50,
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.3),
+                                blurRadius: 60,
+                                spreadRadius: 10,
                               ),
                             ],
                           ),
@@ -194,7 +199,7 @@ class _SplashScreenState extends State<SplashScreen>
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 48),
-                          child: PixelButton(
+                          child: GlowButton(
                             text: 'START GAME',
                             emoji: '🎮',
                             color: PixelTheme.primary,

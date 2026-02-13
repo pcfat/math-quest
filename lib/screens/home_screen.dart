@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 import 'topic_list_screen.dart';
 import 'profile_screen.dart';
 import 'daily_mission_screen.dart';
@@ -127,8 +128,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: PixelTheme.accent.withOpacity(0.2),
-                  border: Border.all(color: PixelTheme.accent, width: 3),
+                  gradient: LinearGradient(
+                    colors: [
+                      PixelTheme.accent.withOpacity(0.2),
+                      PixelTheme.accent.withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: PixelTheme.accent.withOpacity(0.5), width: 2),
                 ),
                 child: Center(
                   child: Text(gameState.activePet!.emoji, style: const TextStyle(fontSize: 24)),
@@ -138,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           
           const SizedBox(width: 8),
           
-          // 玩家頭像和等級
+          // 玩家頭像和等級 - 使用 StatBadge 風格
           GestureDetector(
             onTap: () => Navigator.push(
               context,
@@ -150,8 +157,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: PixelTheme.bgMid,
-                    border: Border.all(color: PixelTheme.secondary, width: 3),
+                    gradient: const LinearGradient(
+                      colors: [PixelTheme.secondary, PixelTheme.secondaryGlow],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: PixelTheme.secondary.withOpacity(0.5), width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: PixelTheme.secondary.withOpacity(0.3),
+                        blurRadius: 12,
+                      ),
+                    ],
                   ),
                   child: Center(
                     child: Text(gameState.avatarEmoji, style: const TextStyle(fontSize: 24)),
@@ -165,7 +181,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       gameState.username,
                       style: PixelTheme.pixelText(size: 10),
                     ),
-                    PixelBadge(text: 'LV ${gameState.level}', fontSize: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [PixelTheme.primary, Color(0xFF8B7FFF)],
+                        ),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'LV ${gameState.level}',
+                        style: PixelTheme.pixelText(size: 6, color: Colors.white),
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -174,30 +202,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           
           const Spacer(),
           
-          // 金幣
-          _buildStatChip('🪙', '${gameState.progress.totalScore}'),
+          // 金幣 - 使用 StatBadge
+          StatBadge(
+            emoji: '🪙',
+            value: '${gameState.progress.totalScore}',
+            glowColor: PixelTheme.secondary,
+          ),
           
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           
-          // 連勝
-          _buildStatChip('🔥', '${gameState.progress.streak}'),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildStatChip(String emoji, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: PixelTheme.bgMid,
-        border: Border.all(color: PixelTheme.textDim, width: 2),
-      ),
-      child: Row(
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 16)),
-          const SizedBox(width: 6),
-          Text(value, style: PixelTheme.pixelText(size: 10)),
+          // 連勝 - 使用 StreakBadge
+          StreakBadge(
+            days: gameState.progress.streak,
+            isActive: gameState.progress.streak > 0,
+          ),
         ],
       ),
     );
@@ -271,8 +289,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildMainMenu(BuildContext context) {
     return Column(
       children: [
-        // 開始遊戲
-        PixelButton(
+        // 開始遊戲 - 使用 GlowButton
+        GlowButton(
           text: 'START GAME',
           emoji: '🎮',
           color: PixelTheme.primary,
@@ -284,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         const SizedBox(height: 16),
         
         // 冒險模式
-        PixelButton(
+        GlowButton(
           text: 'ADVENTURE',
           emoji: '🗺️',
           color: PixelTheme.secondary,
@@ -299,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         const SizedBox(height: 16),
         
         // 計時挑戰
-        PixelButton(
+        GlowButton(
           text: 'TIME ATTACK',
           emoji: '⏱️',
           color: PixelTheme.error,
@@ -342,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: _buildQuickButton(
             emoji: '🎖️',
             label: 'BADGE',
-            color: const Color(0xFFa855f7),
+            color: const PixelTheme.purple,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AchievementsScreen()),
@@ -361,9 +379,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: PixelCard(
-        borderColor: color,
+      child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: PixelTheme.codedexCard(
+          borderColor: color.withOpacity(0.5),
+          withGlow: true,
+        ),
         child: Column(
           children: [
             Text(emoji, style: const TextStyle(fontSize: 28)),
@@ -381,8 +402,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         context,
         MaterialPageRoute(builder: (_) => const DailyMissionScreen()),
       ),
-      child: PixelCard(
-        borderColor: PixelTheme.secondary,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: PixelTheme.codedexCard(
+          borderColor: PixelTheme.secondary.withOpacity(0.5),
+          withGlow: true,
+        ),
         child: Row(
           children: [
             const Text('📋', style: TextStyle(fontSize: 32)),
@@ -416,9 +441,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildBottomNav(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        color: PixelTheme.bgMid,
-        border: Border(top: BorderSide(color: PixelTheme.textDim, width: 3)),
+      decoration: BoxDecoration(
+        color: PixelTheme.bgMid.withOpacity(0.95),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border(
+          top: BorderSide(color: PixelTheme.textMuted.withOpacity(0.3), width: 1),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -462,13 +497,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: PixelTheme.bgMid,
-          border: Border(top: BorderSide(color: PixelTheme.textDim, width: 4)),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [PixelTheme.bgCard, PixelTheme.bgMid],
+          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border.all(
+            color: PixelTheme.textMuted.withOpacity(0.3),
+            width: 1,
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // 頂部指示條
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: PixelTheme.textMuted,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
             Text(
               'SELECT LEVEL',
               style: PixelTheme.pixelTitle(size: 14),
@@ -477,10 +530,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Row(
               children: [
                 Expanded(
-                  child: PixelButton(
+                  child: GlowButton(
                     text: 'JUNIOR',
                     emoji: '📗',
                     color: PixelTheme.primary,
+                    height: 56,
                     fontSize: 10,
                     onPressed: () {
                       Navigator.pop(context);
@@ -495,10 +549,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: PixelButton(
+                  child: GlowButton(
                     text: 'SENIOR',
                     emoji: '📕',
                     color: PixelTheme.accent,
+                    height: 56,
                     fontSize: 10,
                     onPressed: () {
                       Navigator.pop(context);
