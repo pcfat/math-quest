@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../data/game_state.dart';
 import '../models/pet_models.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 import 'home_screen.dart';
 
 class PetSelectionScreen extends StatefulWidget {
@@ -82,16 +83,10 @@ class _PetSelectionScreenState extends State<PetSelectionScreen>
                       child: Container(
                         width: 150,
                         height: 150,
-                        decoration: BoxDecoration(
-                          color: PixelTheme.bgMid,
-                          border: Border.all(color: _getRarityColor(selectedPet.rarity), width: 4),
-                          boxShadow: [
-                            BoxShadow(
-                              color: _getRarityColor(selectedPet.rarity).withOpacity(0.5),
-                              blurRadius: 30,
-                              spreadRadius: 5,
-                            ),
-                          ],
+                        decoration: PixelTheme.codedexCard(
+                          borderColor: _getRarityColor(selectedPet.rarity),
+                          borderRadius: 16,
+                          withGlow: true,
                         ),
                         child: Center(
                           child: Text(
@@ -150,16 +145,15 @@ class _PetSelectionScreenState extends State<PetSelectionScreen>
                             margin: const EdgeInsets.symmetric(horizontal: 8),
                             width: isSelected ? 80 : 64,
                             height: isSelected ? 80 : 64,
-                            decoration: BoxDecoration(
+                            decoration: PixelTheme.codedexCard(
                               color: isSelected 
                                   ? _getRarityColor(pet.rarity).withOpacity(0.2)
-                                  : PixelTheme.bgMid,
-                              border: Border.all(
-                                color: isSelected 
-                                    ? _getRarityColor(pet.rarity)
-                                    : PixelTheme.textDim,
-                                width: isSelected ? 4 : 2,
-                              ),
+                                  : null,
+                              borderColor: isSelected 
+                                  ? _getRarityColor(pet.rarity)
+                                  : PixelTheme.textMuted,
+                              borderRadius: 12,
+                              withGlow: isSelected,
                             ),
                             child: Center(
                               child: Text(
@@ -199,9 +193,11 @@ class _PetSelectionScreenState extends State<PetSelectionScreen>
   Widget _buildStatBadge(String emoji, String label, int value, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
+      decoration: PixelTheme.codedexCard(
         color: color.withOpacity(0.2),
-        border: Border.all(color: color, width: 3),
+        borderColor: color,
+        borderRadius: 12,
+        withGlow: false,
       ),
       child: Row(
         children: [
@@ -211,7 +207,36 @@ class _PetSelectionScreenState extends State<PetSelectionScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: PixelTheme.pixelText(size: 7, color: color)),
-              Text('$value', style: PixelTheme.pixelText(size: 14, color: color)),
+              // Progress bar with gradient
+              Container(
+                width: 60,
+                height: 10,
+                margin: const EdgeInsets.only(top: 4),
+                decoration: BoxDecoration(
+                  color: PixelTheme.bgLight,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: (value / 100).clamp(0.0, 1.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [color, color.withOpacity(0.7)],
+                      ),
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withOpacity(0.5),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text('$value', style: PixelTheme.pixelText(size: 10, color: color)),
             ],
           ),
         ],
