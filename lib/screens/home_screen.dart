@@ -360,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: _buildQuickButton(
             emoji: '🎖️',
             label: 'BADGE',
-            color: const PixelTheme.purple,
+            color: PixelTheme.purple,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AchievementsScreen()),
