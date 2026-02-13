@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 
 class LeaderboardScreen extends StatelessWidget {
   const LeaderboardScreen({super.key});
@@ -57,7 +58,8 @@ class LeaderboardScreen extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: PixelTheme.bgMid,
-                border: Border.all(color: PixelTheme.textDim, width: 3),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: PixelTheme.textDim.withOpacity(0.5), width: 2),
               ),
               child: const Center(
                 child: Text('←', style: TextStyle(
@@ -107,13 +109,26 @@ class LeaderboardScreen extends StatelessWidget {
     
     return Column(
       children: [
-        // Avatar
+        // Avatar with glow
         Container(
           width: rank == 1 ? 64 : 52,
           height: rank == 1 ? 64 : 52,
           decoration: BoxDecoration(
-            color: PixelTheme.bgMid,
-            border: Border.all(color: colors[rank]!, width: 3),
+            gradient: LinearGradient(
+              colors: [
+                colors[rank]!.withOpacity(0.3),
+                colors[rank]!.withOpacity(0.1),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colors[rank]!, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: colors[rank]!.withOpacity(0.6),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
           ),
           child: Center(
             child: Text(entry.avatar, style: TextStyle(fontSize: rank == 1 ? 32 : 24)),
@@ -130,7 +145,7 @@ class LeaderboardScreen extends StatelessWidget {
           style: PixelTheme.pixelText(size: 8, color: colors[rank]!),
         ),
         const SizedBox(height: 4),
-        // Podium
+        // Podium with gradient
         Container(
           width: 80,
           height: height,
@@ -140,7 +155,18 @@ class LeaderboardScreen extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: [colors[rank]!, colors[rank]!.withOpacity(0.6)],
             ),
-            border: Border.all(color: Colors.black54, width: 3),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
+            ),
+            border: Border.all(color: colors[rank]!.withOpacity(0.8), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: colors[rank]!.withOpacity(0.4),
+                blurRadius: 12,
+                spreadRadius: 0,
+              ),
+            ],
           ),
           child: Column(
             children: [
@@ -158,24 +184,44 @@ class LeaderboardScreen extends StatelessWidget {
   }
   
   Widget _buildRankItem(dynamic entry) {
-    return PixelCard(
-      borderColor: entry.isCurrentUser ? PixelTheme.primary : PixelTheme.textDim,
-      bgColor: entry.isCurrentUser ? PixelTheme.primary.withOpacity(0.1) : null,
+    return Container(
       padding: const EdgeInsets.all(12),
+      decoration: PixelTheme.codedexCard(
+        borderColor: entry.isCurrentUser 
+          ? PixelTheme.primary.withOpacity(0.8) 
+          : PixelTheme.textMuted.withOpacity(0.3),
+        withGlow: entry.isCurrentUser,
+      ),
       child: Row(
         children: [
-          // Rank
+          // Rank badge with gradient
           Container(
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: PixelTheme.bgLight,
-              border: Border.all(color: PixelTheme.textDim, width: 2),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  PixelTheme.bgLight,
+                  PixelTheme.bgMid,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: entry.isCurrentUser 
+                  ? PixelTheme.primary.withOpacity(0.5) 
+                  : PixelTheme.textDim.withOpacity(0.3),
+                width: 2,
+              ),
             ),
             child: Center(
               child: Text(
                 '${entry.rank}',
-                style: PixelTheme.pixelText(size: 10),
+                style: PixelTheme.pixelText(
+                  size: 10,
+                  color: entry.isCurrentUser ? PixelTheme.primary : PixelTheme.textLight,
+                ),
               ),
             ),
           ),
@@ -185,8 +231,19 @@ class LeaderboardScreen extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: PixelTheme.bgLight,
-              border: Border.all(color: PixelTheme.textDim, width: 2),
+              gradient: LinearGradient(
+                colors: [
+                  PixelTheme.bgLight.withOpacity(0.5),
+                  PixelTheme.bgMid,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: entry.isCurrentUser 
+                  ? PixelTheme.primary.withOpacity(0.5) 
+                  : PixelTheme.textDim.withOpacity(0.3),
+                width: 2,
+              ),
             ),
             child: Center(
               child: Text(entry.avatar, style: const TextStyle(fontSize: 20)),
