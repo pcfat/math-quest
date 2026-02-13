@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 import 'adventure_battle_screen.dart';
 
 class AdventureScreen extends StatefulWidget {
@@ -260,6 +261,7 @@ class _AdventureScreenState extends State<AdventureScreen>
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: PixelTheme.bgLight,
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: PixelTheme.textDim, width: 2),
               ),
               child: const Icon(Icons.arrow_back, color: PixelTheme.textLight, size: 18),
@@ -278,6 +280,7 @@ class _AdventureScreenState extends State<AdventureScreen>
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: PixelTheme.bgLight,
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: PixelTheme.textDim, width: 2),
             ),
             child: Row(
@@ -457,13 +460,13 @@ class _AdventureScreenState extends State<AdventureScreen>
       height: _tileSize,
       decoration: BoxDecoration(
         color: PixelTheme.primary.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(6),
         border: Border.all(color: PixelTheme.primary, width: 2),
         boxShadow: [
           BoxShadow(
-            color: PixelTheme.primary.withOpacity(0.5),
-            blurRadius: 8,
-            spreadRadius: 1,
+            color: PixelTheme.primary.withOpacity(0.6),
+            blurRadius: 12,
+            spreadRadius: 2,
           ),
         ],
       ),
@@ -492,10 +495,9 @@ class _AdventureScreenState extends State<AdventureScreen>
               // 資訊
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: PixelTheme.bgMid,
-                  border: Border.all(color: PixelTheme.textDim, width: 2),
-                  borderRadius: BorderRadius.circular(8),
+                decoration: PixelTheme.codedexCard(
+                  borderColor: PixelTheme.textDim,
+                  borderRadius: 12,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -671,7 +673,7 @@ class _AdventureScreenState extends State<AdventureScreen>
               color.withOpacity(0.7),
             ],
           ),
-          borderRadius: BorderRadius.circular(25),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white.withOpacity(0.4), width: 3),
           boxShadow: [
             BoxShadow(
