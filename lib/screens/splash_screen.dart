@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/pixel_theme.dart';
 import '../theme/codedex_widgets.dart';
+import 'onboarding_screen.dart';
 import 'grade_selection_screen.dart';
 import 'home_screen.dart';
 import 'pet_selection_screen.dart';
@@ -61,7 +63,29 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
-  void _startGame() {
+  void _startGame() async {
+    // 檢查是否已完成 onboarding
+    final prefs = await SharedPreferences.getInstance();
+    final hasCompletedOnboarding = prefs.getBool('onboarding_completed') ?? false;
+    
+    if (!mounted) return;
+    
+    // 如果未完成 onboarding，導向 OnboardingScreen
+    if (!hasCompletedOnboarding) {
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => const OnboardingScreen(),
+          transitionsBuilder: (_, animation, __, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 500),
+        ),
+      );
+      return;
+    }
+    
+    // 已完成 onboarding，根據遊戲狀態導向對應畫面
     final gameState = context.read<GameState>();
     
     Widget destination;
