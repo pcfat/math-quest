@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -77,8 +78,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: PixelTheme.bgMid,
-                border: Border.all(color: PixelTheme.textDim, width: 3),
+                gradient: const LinearGradient(
+                  colors: [PixelTheme.bgCard, PixelTheme.bgMid],
+                ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: PixelTheme.textMuted.withOpacity(0.5), width: 2),
               ),
               child: const Center(
                 child: Text('←', style: TextStyle(
@@ -97,8 +101,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
   
   Widget _buildAvatarCard(GameState gameState) {
-    return PixelCard(
-      borderColor: PixelTheme.secondary,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: PixelTheme.codedexCard(
+        borderColor: PixelTheme.secondary.withOpacity(0.5),
+        withGlow: true,
+      ),
       child: Column(
         children: [
           // 頭像
@@ -111,8 +119,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: PixelTheme.bgLight,
-                    border: Border.all(color: PixelTheme.secondary, width: 4),
+                    gradient: const LinearGradient(
+                      colors: [PixelTheme.secondary, Color(0xFFFFB700)],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: PixelTheme.secondary.withOpacity(0.5), width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: PixelTheme.secondary.withOpacity(0.4),
+                        blurRadius: 20,
+                      ),
+                    ],
                   ),
                   child: Center(
                     child: Text(gameState.avatarEmoji, style: const TextStyle(fontSize: 40)),
@@ -123,7 +140,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 28,
                   decoration: BoxDecoration(
                     color: PixelTheme.accent,
-                    border: Border.all(color: Colors.black, width: 2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.black26, width: 2),
                   ),
                   child: const Center(
                     child: Text('✎', style: TextStyle(fontSize: 14)),
@@ -157,14 +175,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
-              color: PixelTheme.secondary,
-              border: const Border(
-                bottom: BorderSide(color: Color(0xFFb8860b), width: 4),
+              gradient: const LinearGradient(
+                colors: [PixelTheme.secondary, Color(0xFFFFB700)],
               ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: PixelTheme.secondary.withOpacity(0.4),
+                  blurRadius: 12,
+                ),
+              ],
             ),
             child: Text(
               'LEVEL ${gameState.level}',
-              style: PixelTheme.pixelText(size: 10, color: PixelTheme.bgDark),
+              style: PixelTheme.pixelText(size: 10, color: Colors.white),
             ),
           ),
         ],
@@ -173,67 +197,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
   
   Widget _buildExpCard(GameState gameState) {
-    return PixelCard(
-      borderColor: PixelTheme.accent,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('EXPERIENCE', style: PixelTheme.pixelText(size: 10, color: PixelTheme.accent)),
-              Text(
-                '${gameState.experience} / ${gameState.experienceForNextLevel}',
-                style: PixelTheme.pixelText(size: 8, color: PixelTheme.textDim),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          PixelProgressBar(
-            value: gameState.levelProgress,
-            fillColor: PixelTheme.accent,
-            height: 24,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Need ${gameState.experienceForNextLevel - gameState.experience} more to level up!',
-            style: PixelTheme.pixelText(size: 7, color: PixelTheme.textDim),
-          ),
-        ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: PixelTheme.codedexCard(
+        borderColor: PixelTheme.primary.withOpacity(0.5),
+        withGlow: true,
+      ),
+      child: XpProgressBar(
+        level: gameState.level,
+        currentXp: gameState.experience,
+        xpToNextLevel: gameState.experienceForNextLevel,
+        levelColor: PixelTheme.primary,
       ),
     );
   }
   
   Widget _buildStatsCard(GameState gameState) {
-    return PixelCard(
-      borderColor: PixelTheme.primary,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: PixelTheme.codedexCard(
+        borderColor: PixelTheme.accent.withOpacity(0.5),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('STATISTICS', style: PixelTheme.pixelText(size: 10, color: PixelTheme.primary)),
+          Text('STATISTICS', style: PixelTheme.pixelText(size: 10, color: PixelTheme.accent)),
           const SizedBox(height: 16),
-          _buildStatRow('🏆', 'Total Score', '${gameState.progress.totalScore}'),
-          _buildStatRow('📚', 'Quizzes', '${gameState.progress.quizzesCompleted}'),
-          _buildStatRow('🔥', 'Best Streak', '${gameState.progress.streak}'),
-          _buildStatRow('📅', 'Daily Missions', '${gameState.progress.dailyMissionsCompleted}'),
-          _buildStatRow('🎖️', 'Achievements', '${gameState.unlockedAchievements.length}/${gameState.achievements.length}'),
-          _buildStatRow('📖', 'Topics Tried', '${gameState.progress.topicAttempts.length}/${gameState.allTopics.length}'),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildStatRow(String emoji, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 20)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(label, style: PixelTheme.pixelText(size: 9)),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              StatBadge(
+                emoji: '🏆',
+                value: '${gameState.progress.totalScore}',
+                label: 'SCORE',
+                glowColor: PixelTheme.secondary,
+              ),
+              StatBadge(
+                emoji: '📚',
+                value: '${gameState.progress.quizzesCompleted}',
+                label: 'QUIZZES',
+              ),
+              StatBadge(
+                emoji: '🔥',
+                value: '${gameState.progress.streak}',
+                label: 'STREAK',
+                glowColor: PixelTheme.orange,
+              ),
+              StatBadge(
+                emoji: '📅',
+                value: '${gameState.progress.dailyMissionsCompleted}',
+                label: 'MISSIONS',
+              ),
+              StatBadge(
+                emoji: '🎖️',
+                value: '${gameState.unlockedAchievements.length}',
+                label: 'BADGES',
+                glowColor: PixelTheme.primary,
+              ),
+              StatBadge(
+                emoji: '📖',
+                value: '${gameState.progress.topicAttempts.length}',
+                label: 'TOPICS',
+              ),
+            ],
           ),
-          Text(value, style: PixelTheme.pixelText(size: 10, color: PixelTheme.secondary)),
         ],
       ),
     );

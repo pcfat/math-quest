@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 import 'quiz_screen.dart';
 
 class TopicListScreen extends StatelessWidget {
@@ -65,8 +66,11 @@ class TopicListScreen extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: PixelTheme.bgMid,
-                border: Border.all(color: PixelTheme.textDim, width: 3),
+                gradient: const LinearGradient(
+                  colors: [PixelTheme.bgCard, PixelTheme.bgMid],
+                ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: PixelTheme.textMuted.withOpacity(0.5), width: 2),
               ),
               child: const Center(
                 child: Text('←', style: TextStyle(
@@ -97,10 +101,24 @@ class TopicListScreen extends StatelessWidget {
             ),
           ),
           if (timedMode)
-            PixelBadge(
-              text: '⏱️ TIMED',
-              color: PixelTheme.error,
-              fontSize: 6,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [PixelTheme.error, Color(0xFFFF4444)],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: PixelTheme.error.withOpacity(0.5),
+                    blurRadius: 12,
+                  ),
+                ],
+              ),
+              child: Text(
+                '⏱️ TIMED',
+                style: PixelTheme.pixelText(size: 6, color: Colors.white),
+              ),
             ),
         ],
       ),
@@ -108,115 +126,21 @@ class TopicListScreen extends StatelessWidget {
   }
   
   Widget _buildTopicCard(BuildContext context, topic, int attempts, int bestScore) {
-    return GestureDetector(
+    final maxScore = topic.questions.length * 30;
+    final progress = attempts > 0 ? (bestScore / maxScore).clamp(0.0, 1.0) : 0.0;
+    final earnedStars = bestScore >= maxScore * 0.9 ? 3 
+                      : bestScore >= maxScore * 0.7 ? 2
+                      : bestScore > 0 ? 1 : 0;
+    
+    return QuestCard(
+      emoji: topic.icon,
+      title: topic.name,
+      subtitle: '${topic.nameEn.toUpperCase()} • ${topic.questions.length} 題目',
+      progress: progress,
+      earnedStars: earnedStars,
+      totalStars: 3,
+      accentColor: Color(topic.color),
       onTap: () => _startQuiz(context, topic),
-      child: PixelCard(
-        borderColor: Color(topic.color),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                // 課題圖標
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Color(topic.color).withOpacity(0.2),
-                    border: Border.all(color: Color(topic.color), width: 3),
-                  ),
-                  child: Center(
-                    child: Text(topic.icon, style: const TextStyle(fontSize: 28)),
-                  ),
-                ),
-                
-                const SizedBox(width: 16),
-                
-                // 課題資訊
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        topic.name,
-                        style: PixelTheme.pixelText(
-                          size: 12,
-                          color: Color(topic.color),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        topic.nameEn.toUpperCase(),
-                        style: PixelTheme.pixelText(
-                          size: 8,
-                          color: PixelTheme.textDim,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // 進入箭頭
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Color(topic.color),
-                    border: Border(
-                      right: const BorderSide(color: Colors.black54, width: 3),
-                      bottom: const BorderSide(color: Colors.black54, width: 3),
-                    ),
-                  ),
-                  child: const Center(
-                    child: Text('▶', style: TextStyle(
-                      fontSize: 16,
-                      color: PixelTheme.bgDark,
-                    )),
-                  ),
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // 統計資料
-            Row(
-              children: [
-                _buildStatItem('📊', '$attempts', '挑戰'),
-                const SizedBox(width: 24),
-                _buildStatItem('🏆', '$bestScore', '最高分'),
-                const SizedBox(width: 24),
-                _buildStatItem('📝', '${topic.questions.length}', '題目'),
-              ],
-            ),
-            
-            const SizedBox(height: 12),
-            
-            // 進度條
-            PixelProgressBar(
-              value: attempts > 0 ? (bestScore / (topic.questions.length * 30)).clamp(0, 1) : 0,
-              fillColor: Color(topic.color),
-              height: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  Widget _buildStatItem(String emoji, String value, String label) {
-    return Row(
-      children: [
-        Text(emoji, style: const TextStyle(fontSize: 14)),
-        const SizedBox(width: 4),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(value, style: PixelTheme.pixelText(size: 10)),
-            Text(label, style: PixelTheme.pixelText(size: 6, color: PixelTheme.textDim)),
-          ],
-        ),
-      ],
     );
   }
   
