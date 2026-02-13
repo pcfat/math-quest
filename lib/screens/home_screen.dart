@@ -180,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           
           const SizedBox(width: 8),
           
-          // 玩家頭像和等級 - 使用 AvatarWidget
+          // 玩家頭像和等級 - 點擊編輯角色
           GestureDetector(
             onTap: _editAvatar,
             child: Row(

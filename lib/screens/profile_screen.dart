@@ -18,12 +18,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _nameController = TextEditingController();
   AvatarData? _currentAvatar;
-  
-  final List<String> _avatars = [
-    '😊', '😎', '🤓', '🧑‍🎓', '👨‍💻', '👩‍🏫', '🦸', '🧙',
-    '🐱', '🐶', '🦊', '🐼', '🐨', '🦁', '🐯', '🐮',
-    '👾', '🤖', '👻', '💀', '🎮', '🕹️', '🎯', '🏆',
-  ];
 
   @override
   void initState() {
@@ -324,55 +318,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ],
-      ),
-    );
-  }
-  
-  void _showAvatarPicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: PixelTheme.bgMid,
-          border: Border(top: BorderSide(color: PixelTheme.textDim, width: 4)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('SELECT AVATAR', style: PixelTheme.pixelTitle(size: 12)),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _avatars.map((emoji) {
-                final isSelected = context.read<GameState>().avatarEmoji == emoji;
-                return GestureDetector(
-                  onTap: () {
-                    context.read<GameState>().setAvatar(emoji);
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: isSelected ? PixelTheme.accent.withOpacity(0.3) : PixelTheme.bgLight,
-                      border: Border.all(
-                        color: isSelected ? PixelTheme.accent : PixelTheme.textDim,
-                        width: 3,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(emoji, style: const TextStyle(fontSize: 24)),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
       ),
     );
   }
