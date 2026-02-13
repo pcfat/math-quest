@@ -429,7 +429,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [PixelTheme.accent, Color(0xFFa855f7)],
+                          colors: [PixelTheme.accent, PixelTheme.purple],
                         ),
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [

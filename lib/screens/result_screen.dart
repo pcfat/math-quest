@@ -81,7 +81,7 @@ class _ResultScreenState extends State<ResultScreen> with TickerProviderStateMix
         child: Stack(
           children: [
             // 像素 Confetti 效果
-            if (percentage >= 60)
+            if (percentage >= PixelTheme.starThresholdMid)
               AnimatedBuilder(
                 animation: _confettiController,
                 builder: (context, child) {
@@ -214,7 +214,9 @@ class _ResultScreenState extends State<ResultScreen> with TickerProviderStateMix
                         AnimatedBuilder(
                           animation: _starsController,
                           builder: (context, child) {
-                            final starCount = percentage >= 80 ? 3 : percentage >= 60 ? 2 : percentage >= 40 ? 1 : 0;
+                            final starCount = percentage >= PixelTheme.starThresholdHigh ? 3 
+                                            : percentage >= PixelTheme.starThresholdMid ? 2 
+                                            : percentage >= PixelTheme.starThresholdLow ? 1 : 0;
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: List.generate(3, (i) {
@@ -373,11 +375,11 @@ class _ResultScreenState extends State<ResultScreen> with TickerProviderStateMix
   }
   
   _Grade _getGrade(int percentage) {
-    if (percentage >= 80) {
+    if (percentage >= PixelTheme.starThresholdHigh) {
       return _Grade('EXCELLENT!', '🏆', 'You are a math genius!', PixelTheme.secondary);
-    } else if (percentage >= 60) {
+    } else if (percentage >= PixelTheme.starThresholdMid) {
       return _Grade('GREAT!', '👍', 'Keep up the good work!', PixelTheme.primary);
-    } else if (percentage >= 40) {
+    } else if (percentage >= PixelTheme.starThresholdLow) {
       return _Grade('GOOD TRY', '💪', 'Practice makes perfect!', PixelTheme.accent);
     } else {
       return _Grade('KEEP GOING', '📚', 'Don\'t give up!', PixelTheme.error);
@@ -458,6 +460,6 @@ class _PixelConfetti {
       PixelTheme.secondary,
       PixelTheme.accent,
       PixelTheme.error,
-      const Color(0xFFa855f7),
+      const PixelTheme.purple,
     ][seed % 5];
 }

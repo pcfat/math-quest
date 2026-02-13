@@ -247,7 +247,7 @@ class _PetSelectionScreenState extends State<PetSelectionScreen>
     switch (rarity) {
       case PetRarity.common: return PixelTheme.textLight;
       case PetRarity.rare: return PixelTheme.accent;
-      case PetRarity.epic: return const Color(0xFFa855f7);
+      case PetRarity.epic: return const PixelTheme.purple;
       case PetRarity.legendary: return PixelTheme.secondary;
     }
   }

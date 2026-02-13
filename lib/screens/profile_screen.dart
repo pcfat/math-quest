@@ -120,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 80,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [PixelTheme.secondary, Color(0xFFFFB700)],
+                      colors: [PixelTheme.secondary, PixelTheme.secondaryGlow],
                     ),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: PixelTheme.secondary.withOpacity(0.5), width: 3),
@@ -176,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [PixelTheme.secondary, Color(0xFFFFB700)],
+                colors: [PixelTheme.secondary, PixelTheme.secondaryGlow],
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [

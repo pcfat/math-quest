@@ -108,7 +108,7 @@ class AchievementsScreen extends StatelessWidget {
   Widget _buildAchievementCard(dynamic achievement, bool isUnlocked) {
     // Use utility method for rarity color
     final rarityColor = isUnlocked 
-        ? PixelTheme.getRarityColor(achievement.rarity ?? 'common')
+        ? PixelTheme.getRarityColor(achievement.rarity ?? PixelTheme.defaultRarity)
         : PixelTheme.textDim;
     
     return Container(

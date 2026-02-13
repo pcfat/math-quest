@@ -10,10 +10,12 @@ class PixelTheme {
   
   static const Color primary = Color(0xFF6C63FF);     // 霓虹紫 (主色)
   static const Color secondary = Color(0xFFFFD700);   // 金黃 (金幣/分數)
+  static const Color secondaryGlow = Color(0xFFFFB700); // 金黃發光
   static const Color accent = Color(0xFF00D4AA);      // 青綠 (特殊)
   static const Color pink = Color(0xFFFF6B9D);        // 粉紅
   static const Color cyan = Color(0xFF38B6FF);        // 天藍
   static const Color orange = Color(0xFFFF8C42);      // 橙色
+  static const Color purple = Color(0xFFa855f7);      // 紫色 (史詩)
   
   static const Color textLight = Color(0xFFF0F6FC);   // 白色文字
   static const Color textDim = Color(0xFF8B949E);     // 暗灰文字
@@ -22,6 +24,12 @@ class PixelTheme {
   static const Color success = Color(0xFF00D4AA);     // 答對
   static const Color error = Color(0xFFff6b6b);       // 答錯
   static const Color warning = Color(0xFFFFD700);     // 警告
+  
+  // 常數
+  static const String defaultRarity = 'common';       // 預設稀有度
+  static const double starThresholdHigh = 80.0;       // 3星門檻 (80%+)
+  static const double starThresholdMid = 60.0;        // 2星門檻 (60%+)
+  static const double starThresholdLow = 40.0;        // 1星門檻 (40%+)
   
   // 保留向後兼容的像素色
   static const Color pixel1 = Color(0xFF5fcde4);      // 青色
@@ -63,9 +71,9 @@ class PixelTheme {
   static Color getRarityColor(String rarity) {
     switch (rarity.toLowerCase()) {
       case 'legendary':
-        return const Color(0xFFFFD700); // Gold
+        return secondary; // Gold
       case 'epic':
-        return primary; // Purple
+        return purple; // Purple
       case 'rare':
         return cyan; // Blue
       case 'common':

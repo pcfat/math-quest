@@ -158,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   height: 44,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [PixelTheme.secondary, Color(0xFFFFB700)],
+                      colors: [PixelTheme.secondary, PixelTheme.secondaryGlow],
                     ),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: PixelTheme.secondary.withOpacity(0.5), width: 2),
@@ -360,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: _buildQuickButton(
             emoji: '🎖️',
             label: 'BADGE',
-            color: const Color(0xFFa855f7),
+            color: const PixelTheme.purple,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AchievementsScreen()),
