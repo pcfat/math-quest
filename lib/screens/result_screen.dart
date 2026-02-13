@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../data/game_state.dart';
 import '../theme/pixel_theme.dart';
+import '../theme/codedex_widgets.dart';
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
@@ -115,8 +116,21 @@ class _ResultScreenState extends State<ResultScreen> with TickerProviderStateMix
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            color: grade.color.withOpacity(0.2),
-                            border: Border.all(color: grade.color, width: 4),
+                            gradient: LinearGradient(
+                              colors: [
+                                grade.color.withOpacity(0.3),
+                                grade.color.withOpacity(0.1),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: grade.color.withOpacity(0.5), width: 3),
+                            boxShadow: [
+                              BoxShadow(
+                                color: grade.color.withOpacity(0.5),
+                                blurRadius: 24,
+                                spreadRadius: 0,
+                              ),
+                            ],
                           ),
                           child: Center(
                             child: Text(grade.emoji, style: const TextStyle(fontSize: 60)),
@@ -138,90 +152,150 @@ class _ResultScreenState extends State<ResultScreen> with TickerProviderStateMix
                   // 分數卡片
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 24),
-                    child: PixelCard(
-                      borderColor: grade.color,
-                      child: Column(
-                        children: [
-                          // 課題名稱
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                gameState.currentTopic?.icon ?? '',
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                gameState.currentTopic?.name ?? 'QUIZ',
-                                style: PixelTheme.pixelText(size: 10),
-                              ),
-                            ],
-                          ),
-                          
-                          const SizedBox(height: 24),
-                          
-                          // 動態分數
-                          AnimatedBuilder(
-                            animation: _scoreAnimation,
-                            builder: (context, child) {
-                              return Column(
-                                children: [
-                                  Text(
-                                    'SCORE',
-                                    style: PixelTheme.pixelText(size: 8, color: PixelTheme.textDim),
+                    padding: const EdgeInsets.all(20),
+                    decoration: PixelTheme.codedexCard(
+                      borderColor: grade.color.withOpacity(0.5),
+                      withGlow: true,
+                    ),
+                    child: Column(
+                      children: [
+                        // 課題名稱
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              gameState.currentTopic?.icon ?? '',
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              gameState.currentTopic?.name ?? 'QUIZ',
+                              style: PixelTheme.pixelText(size: 10),
+                            ),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // 動態分數 with glow
+                        AnimatedBuilder(
+                          animation: _scoreAnimation,
+                          builder: (context, child) {
+                            return Column(
+                              children: [
+                                Text(
+                                  'SCORE',
+                                  style: PixelTheme.pixelText(size: 8, color: PixelTheme.textDim),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: PixelTheme.secondary.withOpacity(0.6),
+                                        blurRadius: 24,
+                                        spreadRadius: 4,
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
+                                  child: Text(
                                     '${_scoreAnimation.value.round()}',
                                     style: PixelTheme.pixelTitle(size: 40, color: PixelTheme.secondary),
                                   ),
-                                ],
-                              );
-                            },
-                          ),
-                          
-                          const SizedBox(height: 24),
-                          
-                          // 統計
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: PixelTheme.bgLight.withOpacity(0.5),
-                              border: Border.all(color: PixelTheme.textDim, width: 2),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _buildStatItem('✓', '$correctCount/$totalQuestions', 'CORRECT'),
-                                _buildStatItem('📊', '$percentage%', 'ACCURACY'),
-                                _buildStatItem('🔥', '${gameState.progress.streak}', 'STREAK'),
-                              ],
-                            ),
-                          ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // 經驗值
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: PixelTheme.accent.withOpacity(0.2),
-                              border: Border.all(color: PixelTheme.accent, width: 2),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text('⭐', style: TextStyle(fontSize: 16)),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '+${gameState.sessionScore ~/ 2} EXP',
-                                  style: PixelTheme.pixelText(size: 10, color: PixelTheme.accent),
                                 ),
                               ],
-                            ),
+                            );
+                          },
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // 星星評級 - larger and more prominent
+                        AnimatedBuilder(
+                          animation: _starsController,
+                          builder: (context, child) {
+                            final starCount = percentage >= 80 ? 3 : percentage >= 60 ? 2 : percentage >= 40 ? 1 : 0;
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(3, (i) {
+                                final show = i < starCount && _starsController.value > i / 3;
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                                  child: Text(
+                                    show ? '★' : '☆',
+                                    style: TextStyle(
+                                      fontSize: 40,
+                                      color: show ? PixelTheme.secondary : PixelTheme.textMuted,
+                                      shadows: show ? [
+                                        Shadow(
+                                          color: PixelTheme.secondary.withOpacity(0.8),
+                                          blurRadius: 16,
+                                        ),
+                                        Shadow(
+                                          color: PixelTheme.secondary.withOpacity(0.6),
+                                          blurRadius: 24,
+                                        ),
+                                      ] : null,
+                                    ),
+                                  ),
+                                );
+                              }),
+                            );
+                          },
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // 統計
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: PixelTheme.codedexCard(
+                            borderColor: PixelTheme.textMuted.withOpacity(0.3),
                           ),
-                        ],
-                      ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildStatItem('✓', '$correctCount/$totalQuestions', 'CORRECT'),
+                              _buildStatItem('📊', '$percentage%', 'ACCURACY'),
+                              _buildStatItem('🔥', '${gameState.progress.streak}', 'STREAK'),
+                            ],
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // 經驗值
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                PixelTheme.accent.withOpacity(0.3),
+                                PixelTheme.accent.withOpacity(0.1),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: PixelTheme.accent.withOpacity(0.5), width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: PixelTheme.accent.withOpacity(0.3),
+                                blurRadius: 12,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('⭐', style: TextStyle(fontSize: 18)),
+                              const SizedBox(width: 8),
+                              Text(
+                                '+${gameState.sessionScore ~/ 2} EXP',
+                                style: PixelTheme.pixelText(size: 10, color: PixelTheme.accent),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   
@@ -232,22 +306,46 @@ class _ResultScreenState extends State<ResultScreen> with TickerProviderStateMix
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Column(
                       children: [
-                        PixelButton(
-                          text: 'RETRY',
-                          emoji: '🔄',
-                          color: PixelTheme.primary,
-                          height: 56,
-                          fontSize: 12,
-                          onPressed: () => _retryQuiz(context),
+                        GestureDetector(
+                          onTap: () => _retryQuiz(context),
+                          child: Container(
+                            height: 56,
+                            decoration: PixelTheme.glowButton(color: PixelTheme.primary),
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('🔄', style: TextStyle(fontSize: 16)),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'RETRY',
+                                    style: PixelTheme.pixelText(size: 12, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 12),
-                        PixelButton(
-                          text: 'HOME',
-                          emoji: '🏠',
-                          color: PixelTheme.accent,
-                          height: 56,
-                          fontSize: 12,
-                          onPressed: () => _goHome(context),
+                        GestureDetector(
+                          onTap: () => _goHome(context),
+                          child: Container(
+                            height: 56,
+                            decoration: PixelTheme.glowButton(color: PixelTheme.accent),
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('🏠', style: TextStyle(fontSize: 16)),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'HOME',
+                                    style: PixelTheme.pixelText(size: 12, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
