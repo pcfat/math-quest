@@ -106,6 +106,7 @@ class AchievementsScreen extends StatelessWidget {
   }
   
   Widget _buildAchievementCard(dynamic achievement, bool isUnlocked) {
+    // Rarity-based glow colors - matches achievement.rarity string property
     final rarityColors = {
       'common': PixelTheme.textDim,
       'rare': PixelTheme.accent,
@@ -114,7 +115,7 @@ class AchievementsScreen extends StatelessWidget {
     };
     
     // Default to secondary for unlocked, textDim for locked
-    final glowColor = isUnlocked 
+    final rarityColor = isUnlocked 
         ? (rarityColors[achievement.rarity] ?? PixelTheme.secondary)
         : PixelTheme.textDim;
     
@@ -126,7 +127,7 @@ class AchievementsScreen extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  glowColor.withOpacity(0.15),
+                  rarityColor.withOpacity(0.15),
                   PixelTheme.bgCard,
                 ],
               )
@@ -135,12 +136,12 @@ class AchievementsScreen extends StatelessWidget {
               ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isUnlocked ? glowColor.withOpacity(0.5) : PixelTheme.textMuted.withOpacity(0.3),
+          color: isUnlocked ? rarityColor.withOpacity(0.5) : PixelTheme.textMuted.withOpacity(0.3),
           width: 2,
         ),
         boxShadow: isUnlocked ? [
           BoxShadow(
-            color: glowColor.withOpacity(0.3),
+            color: rarityColor.withOpacity(0.3),
             blurRadius: 16,
             spreadRadius: 0,
           ),
@@ -166,14 +167,14 @@ class AchievementsScreen extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: isUnlocked 
                   ? LinearGradient(
-                      colors: [glowColor.withOpacity(0.3), glowColor.withOpacity(0.1)],
+                      colors: [rarityColor.withOpacity(0.3), rarityColor.withOpacity(0.1)],
                     )
                   : const LinearGradient(
                       colors: [PixelTheme.bgLight, PixelTheme.bgMid],
                     ),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isUnlocked ? glowColor.withOpacity(0.5) : PixelTheme.textMuted,
+                color: isUnlocked ? rarityColor.withOpacity(0.5) : PixelTheme.textMuted,
                 width: 2,
               ),
             ),

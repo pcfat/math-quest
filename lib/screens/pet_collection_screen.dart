@@ -207,7 +207,7 @@ class PetCollectionScreen extends StatelessWidget {
   Widget _buildPetCard(BuildContext context, Pet pet, bool isOwned) {
     final gameState = context.read<GameState>();
     final isActive = gameState.activePet?.id == pet.id;
-    final glowColor = _getRarityColor(pet.rarity);
+    final rarityColor = _getRarityColor(pet.rarity);
     
     return GestureDetector(
       onTap: isOwned ? () => _showPetDetails(context, pet, isOwned) : null,
@@ -229,7 +229,7 @@ class PetCollectionScreen extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        glowColor.withOpacity(0.1),
+                        rarityColor.withOpacity(0.1),
                         PixelTheme.bgCard,
                       ],
                     ))
@@ -239,13 +239,13 @@ class PetCollectionScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isOwned 
-                ? (isActive ? PixelTheme.accent.withOpacity(0.6) : glowColor.withOpacity(0.5))
+                ? (isActive ? PixelTheme.accent.withOpacity(0.6) : rarityColor.withOpacity(0.5))
                 : PixelTheme.textMuted.withOpacity(0.3),
             width: isActive ? 2.5 : 2,
           ),
           boxShadow: isOwned ? [
             BoxShadow(
-              color: (isActive ? PixelTheme.accent : glowColor).withOpacity(0.3),
+              color: (isActive ? PixelTheme.accent : rarityColor).withOpacity(0.3),
               blurRadius: isActive ? 16 : 12,
               spreadRadius: 0,
             ),
