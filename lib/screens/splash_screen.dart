@@ -124,14 +124,19 @@ class _SplashScreenState extends State<SplashScreen>
                           decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                color: PixelTheme.primary.withOpacity(0.3),
-                                blurRadius: 60,
-                                spreadRadius: 20,
+                                color: PixelTheme.primary.withOpacity(0.6),
+                                blurRadius: 80,
+                                spreadRadius: 30,
                               ),
                               BoxShadow(
-                                color: Colors.white.withOpacity(0.5),
-                                blurRadius: 40,
-                                spreadRadius: 5,
+                                color: PixelTheme.primary.withOpacity(0.4),
+                                blurRadius: 120,
+                                spreadRadius: 50,
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.3),
+                                blurRadius: 60,
+                                spreadRadius: 10,
                               ),
                             ],
                           ),
@@ -194,13 +199,35 @@ class _SplashScreenState extends State<SplashScreen>
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 48),
-                          child: PixelButton(
-                            text: 'START GAME',
-                            emoji: '🎮',
-                            color: PixelTheme.primary,
+                          child: Container(
+                            width: double.infinity,
                             height: 70,
-                            fontSize: 14,
-                            onPressed: _startGame,
+                            decoration: PixelTheme.glowButton(
+                              color: PixelTheme.primary,
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: _startGame,
+                                borderRadius: BorderRadius.circular(12),
+                                child: Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text('🎮', style: TextStyle(fontSize: 18)),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        'START GAME',
+                                        style: PixelTheme.pixelText(
+                                          size: 14,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
