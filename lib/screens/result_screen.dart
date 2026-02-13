@@ -460,6 +460,6 @@ class _PixelConfetti {
       PixelTheme.secondary,
       PixelTheme.accent,
       PixelTheme.error,
-      const PixelTheme.purple,
+      PixelTheme.purple,
     ][seed % 5];
 }
